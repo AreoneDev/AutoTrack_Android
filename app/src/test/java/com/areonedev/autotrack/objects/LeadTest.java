@@ -25,7 +25,7 @@ public class LeadTest extends TestCase {
         Date now = new Date();
 
         // Updated to 17-parameter constructor
-        Lead lead = new Lead("Alice", "Chen", "204-555-8123", "alice@test.com", "Sales",
+        Lead lead = com.areonedev.autotrack.testing.LeadFixtures.create("Alice", "Chen", "204-555-8123", "alice@test.com", "Sales",
                 "123 St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 50000.0, interest, null, "NEW", now, "Wants a blue one", now);
 
@@ -48,8 +48,8 @@ public class LeadTest extends TestCase {
         System.out.println(TAG + " Running testLeadIDGeneration.");
         Date now = new Date();
 
-        Lead lead1 = new Lead("Alice", "Chen", "111", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
-        Lead lead2 = new Lead("Bob", "Smith", "222", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead lead1 = com.areonedev.autotrack.testing.LeadFixtures.create("Alice", "Chen", "111", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead lead2 = com.areonedev.autotrack.testing.LeadFixtures.create("Bob", "Smith", "222", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
 
         // IDs should NOT be the same
         assertFalse("Each lead should have a unique ID", lead1.getLeadID() == lead2.getLeadID());
@@ -84,7 +84,7 @@ public class LeadTest extends TestCase {
         Date now = new Date();
         Vehicle v = getTestVehicle();
 
-        Lead lead1 = new Lead("Alice", "Chen", "111", null, null, null, null, null, null, null, 0, v, null, "NEW", now, "", now);
+        Lead lead1 = com.areonedev.autotrack.testing.LeadFixtures.create("Alice", "Chen", "111", null, null, null, null, null, null, null, 0, v, null, "NEW", now, "", now);
 
         // A lead should be equal to itself
         assertTrue("Lead should be equal to itself", lead1.equals(lead1));
@@ -103,14 +103,14 @@ public class LeadTest extends TestCase {
 
         // Case A: Verify that providing NO names throws an exception (if your constructor logic does this)
         try {
-            new Lead(null, null, null, null, null, null, null, null, null, null, 0, null, null, null, now, null, now);
+            com.areonedev.autotrack.testing.LeadFixtures.create(null, null, null, null, null, null, null, null, null, null, 0, null, null, null, now, null, now);
             fail("Constructor should have thrown IllegalArgumentException for missing both names");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
         }
 
         // Case B: Verify that providing ONLY First Name is valid
-        Lead leadOnlyFirst = new Lead("Alice", null, null, null, null, null, null, null, null, null, 0, null, null, "NEW", now, null, now);
+        Lead leadOnlyFirst = com.areonedev.autotrack.testing.LeadFixtures.create("Alice", null, null, null, null, null, null, null, null, null, 0, null, null, "NEW", now, null, now);
         assertEquals("Alice", leadOnlyFirst.getLeadFirstName());
         assertEquals("", leadOnlyFirst.getLeadLastName());
 

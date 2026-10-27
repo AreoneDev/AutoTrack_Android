@@ -82,7 +82,7 @@ public class DataAccessTest{
         // Note: Ensure your Lead constructor matches these parameters
         Vehicle v = new Vehicle("Volkswagen", "Jetta", "2024","Trendline");
         Date now = new Date();
-        Lead testLead = new Lead("Test", "Lead", "555-0199", "test@example.com", "Sales",
+        Lead testLead = com.areonedev.autotrack.testing.LeadFixtures.create("Test", "Lead", "555-0199", "test@example.com", "Sales",
                 "123 Test St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 50000.0, v, null, "NEW", now, "Test Note", now);dataAccess.insertLead(testLead);
         leads.clear();
@@ -123,7 +123,7 @@ public class DataAccessTest{
         assertEquals(leads.size(), 3);
 
         // 1. NEGATIVE TEST: Search for a lead that does NOT exist
-        Lead testLead = new Lead("Non", "Existence", "000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead testLead = com.areonedev.autotrack.testing.LeadFixtures.create("Non", "Existence", "000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         ArrayList<Lead> results = dataAccess.getLeadRandom(testLead);
         assertEquals("Should find 0 leads for non-existent criteria", 0, results.size());
 
@@ -132,12 +132,12 @@ public class DataAccessTest{
         assertEquals(0, results.size());
 
         // 2. Negative Test: Same name, but phone# is different
-        testLead = new Lead("Alice", "Chen", "555-1000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        testLead = com.areonedev.autotrack.testing.LeadFixtures.create("Alice", "Chen", "555-1000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         results = dataAccess.getLeadRandom(testLead);
         assertEquals("The leads list should be empty", 0, results.size());
 
         // 3. POSITIVE TEST: Search for a lead that does exist
-        testLead = new Lead("Alice", "Chen", "204-555-8123", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        testLead = com.areonedev.autotrack.testing.LeadFixtures.create("Alice", "Chen", "204-555-8123", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         results = dataAccess.getLeadRandom(testLead);
         assertEquals("The leads list should not be empty", 0, results.size());
         Lead l2 = leads.get(0);
@@ -165,7 +165,7 @@ public class DataAccessTest{
         /* Insert Unique */
         Vehicle v = new Vehicle("Volkswagen", "Jetta", "2024","Trendline");
         Date now = new Date();
-        Lead testLead = new Lead("Test", "Lead", "555-0199", "test@example.com", "Sales",
+        Lead testLead = com.areonedev.autotrack.testing.LeadFixtures.create("Test", "Lead", "555-0199", "test@example.com", "Sales",
                 "123 Test St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 50000.0, v, null, "NEW", now, "Test Note", now);
         ArrayList<Lead> results = dataAccess.getLeadRandom(testLead);
@@ -180,7 +180,7 @@ public class DataAccessTest{
         assertEquals("Test Lead", leads.getLast().getLeadName());
 
         /* Insert Duplicate */
-        testLead = new Lead("Test", "Lead", "555-0199", "test@example.com", "Sales",
+        testLead = com.areonedev.autotrack.testing.LeadFixtures.create("Test", "Lead", "555-0199", "test@example.com", "Sales",
                 "123 Test St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 50000.0, v, null, "NEW", now, "Test Note", now);
         results = dataAccess.getLeadRandom(testLead);
@@ -231,7 +231,7 @@ public class DataAccessTest{
         /* Update a Non-existent lead */
         // Since leadID is immutable and auto-incrementing, a new Lead will have a unique ID not in the DB
         Date now = new Date();
-        Lead ghost = new Lead("Ghost", "User", "000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead ghost = com.areonedev.autotrack.testing.LeadFixtures.create("Ghost", "User", "000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         String ghostResult = dataAccess.updateLead(ghost);
         assertEquals("Updating a non-existent lead should return an error message", "Lead not found.",ghostResult);
         /* Partial Update: Change only one field */
@@ -278,7 +278,7 @@ public class DataAccessTest{
         // 4. Edge Case: Delete a lead that does not exist (Ghost Lead)
         // This lead has a new ID that was never inserted into the Stub
         Date now = new Date();
-        Lead ghostLead = new Lead("Ghost", "User", "000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead ghostLead = com.areonedev.autotrack.testing.LeadFixtures.create("Ghost", "User", "000", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         String ghostResult = dataAccess.deleteLead(ghostLead);
         assertEquals("Deleting a non-existent lead should return an error message", "Lead not found.", ghostResult);
 

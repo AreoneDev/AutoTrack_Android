@@ -66,7 +66,7 @@ public class BusinessPersistenceSeamTest {
         Vehicle vehicle = new Vehicle("Volkswagen", "Tiguan", "2024","Comfrtline");
 
         // Refactored to 17-parameter constructor
-        Lead newLead = new Lead("Integration", "User", "555-0000", "int@test.com", "Sales",
+        Lead newLead = com.areonedev.autotrack.testing.LeadFixtures.create("Integration", "User", "555-0000", "int@test.com", "Sales",
                 "123 Test St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 45000.0, vehicle, null, "NEW", now, "Integration test note", now);
 
@@ -95,7 +95,7 @@ public class BusinessPersistenceSeamTest {
         // 1. Insert a lead to update
         Date now = new Date();
         // 1. Insert a lead to update
-        Lead lead = new Lead("Original", "Name", "123", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead lead = com.areonedev.autotrack.testing.LeadFixtures.create("Original", "Name", "123", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         al.insertLead(lead);
         long id = lead.getLeadID();
 
@@ -123,7 +123,7 @@ public class BusinessPersistenceSeamTest {
         // 1. Insert a lead to delete
         Date now = new Date();
 
-        Lead lead = new Lead("Delete", "Me", "999", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead lead = com.areonedev.autotrack.testing.LeadFixtures.create("Delete", "Me", "999", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         al.insertLead(lead);
         al.getLeads(leads);
         int sizeAfterInsert = leads.size();
@@ -155,10 +155,10 @@ public class BusinessPersistenceSeamTest {
         Vehicle vehicle = new Vehicle("Volkswagen", "Tiguan", "2024","Comfortline");
 
         // Refactored to 17-parameter constructor
-        al.insertLead(new Lead("Integration", "User", "555-0000", "int@test.com", "Sales",
+        al.insertLead(com.areonedev.autotrack.testing.LeadFixtures.create("Integration", "User", "555-0000", "int@test.com", "Sales",
                 "123 Test St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 45000.0, vehicle, null, "NEW", now, "Integration test note", now));
-        al.insertLead(new Lead("Integration", "User", "555-0000", "int@test.com", "Sales",
+        al.insertLead(com.areonedev.autotrack.testing.LeadFixtures.create("Integration", "User", "555-0000", "int@test.com", "Sales",
                 "123 Test St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 45000.0, vehicle, null, "NEW", now, "Integration test note", now));
 
@@ -207,7 +207,7 @@ public class BusinessPersistenceSeamTest {
         Date now = new Date();
 
         // 1. Insert a specific lead to find
-        Lead searchTarget = new Lead(testFirst, testLast, testPhone, null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead searchTarget = com.areonedev.autotrack.testing.LeadFixtures.create(testFirst, testLast, testPhone, null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         al.insertLead(searchTarget);
 
         // 2. Test successful search
@@ -228,7 +228,7 @@ public class BusinessPersistenceSeamTest {
     public void testGetRandom() {
         // 1. Insert a lead and get its real database ID
         Date now = new Date();
-        Lead target = new Lead("Random", "Target", "555", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
+        Lead target = com.areonedev.autotrack.testing.LeadFixtures.create("Random", "Target", "555", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         al.insertLead(target);
         long realID = target.getLeadID();
         Assert.assertTrue("ID should be valid", realID > 0);

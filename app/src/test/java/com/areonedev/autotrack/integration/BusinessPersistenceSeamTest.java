@@ -117,7 +117,7 @@ public class BusinessPersistenceSeamTest extends TestCase {
 
         Vehicle interest = new Vehicle("Volkswagen", "Tiguan", "2024","Comfortline");
         Date now = new Date();
-        Lead newLead = new Lead(
+        Lead newLead = com.areonedev.autotrack.testing.LeadFixtures.create(
                 "Integration", "User", "555-0000", "int@test.com", "New Cars",
                 "123 Test St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 45000.0, interest, null, "NEW", now, "Integration test note", now

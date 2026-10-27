@@ -2,6 +2,8 @@ package com.areonedev.autotrack.persistence;
 
 import com.areonedev.autotrack.application.Main;
 import com.areonedev.autotrack.objects.Lead;
+import com.areonedev.autotrack.objects.Notification;
+import com.areonedev.autotrack.objects.Task;
 import com.areonedev.autotrack.objects.Vehicle;
 import com.areonedev.autotrack.persistence.DataAccess;
 
@@ -35,7 +37,7 @@ public class DataAccessStub implements DataAccess {
         calendar.set(2023, Calendar.JANUARY, 1);
         createdDate = calendar.getTime();
         Vehicle jetta = new Vehicle("Volkswagen", "Jetta", "2024", "Comfortline");
-        insertLead(new Lead(
+        insertLead(com.areonedev.autotrack.testing.LeadFixtures.create(
                 "Alice", "Chen", "204-555-8123", "alice@example.com", "Sales",
                 "123 Main St", "Winnipeg", "MB", "Canada", "R3C 1A1",
                 32000.0, jetta, null, "NEW", today,
@@ -44,7 +46,7 @@ public class DataAccessStub implements DataAccess {
         calendar.set(2024, Calendar.FEBRUARY, 2);
         createdDate = calendar.getTime();
         Vehicle tiguan = new Vehicle("Volkswagen", "Tiguan", "2024","Comfortline R-Line Black Edition");
-        insertLead(new Lead(
+        insertLead(com.areonedev.autotrack.testing.LeadFixtures.create(
                 "Brian", "Miller", "204-555-1290", "brian@example.com", "Sales",
                 "456 Broadway", "Winnipeg", "MB", "Canada", "R3C 1A2",
                 45000.0, tiguan, null, "VISITED", today,
@@ -53,7 +55,7 @@ public class DataAccessStub implements DataAccess {
         calendar.set(2025, Calendar.MARCH, 3);
         createdDate = calendar.getTime();
         Vehicle atlas = new Vehicle("Volkswagen", "Atlas", "2024","Peak Edition");
-        insertLead(new Lead(
+        insertLead(com.areonedev.autotrack.testing.LeadFixtures.create(
                 "Sophia", "Martinez", "204-555-6677", "sophia@example.com", "Sales",
                 "789 Portage Ave", "Winnipeg", "MB", "Canada", "R3C 1A3",
                 52000.0, atlas, null, "NEGOTIATION", today,
@@ -128,4 +130,31 @@ public class DataAccessStub implements DataAccess {
         }
         return res;
     }
+
+    @Override
+    public List<String> getUniqueColumnValues(String columnName) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<String> getFilteredColumnValues(String targetColumn, String selection, String[] selectionArgs) {
+        return new ArrayList<>();
+    }
+
+    @Override public String getNotificationSequential(List<Notification> result) { result.clear(); return null; }
+    @Override public ArrayList<Notification> getNotificationRandom(Notification value) { return new ArrayList<>(); }
+    @Override public String insertNotification(Notification value) { return null; }
+    @Override public String updateNotification(Notification value) { return null; }
+    @Override public String deleteNotification(Notification value) { return null; }
+    @Override public List<Notification> getAllNotifications() { return new ArrayList<>(); }
+    @Override public String getTaskSequential(List<Task> result) { result.clear(); return null; }
+    @Override public ArrayList<Task> getTaskRandom(Task value) { return new ArrayList<>(); }
+    @Override public String insertTask(Task value) { return null; }
+    @Override public String updateTask(Task value) { return null; }
+    @Override public String deleteTask(Task value) { return null; }
+    @Override public String getVehicleSequential(List<Vehicle> result) { result.clear(); return null; }
+    @Override public ArrayList<Vehicle> getVehicleRandom(Vehicle value) { return new ArrayList<>(); }
+    @Override public String insertVehicle(Vehicle value) { return null; }
+    @Override public String updateVehicle(Vehicle value) { return null; }
+    @Override public String deleteVehicle(Vehicle value) { return null; }
 }
