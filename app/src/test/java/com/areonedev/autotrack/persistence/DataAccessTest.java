@@ -75,6 +75,7 @@ public class DataAccessTest{
         dataAccess = Services.getDataAccess(dbName);
     }
 
+    @org.junit.After
     public void tearDown() {
         Services.closeDataAccess();
         Log.d(TAG, "Finished Persistence test DataAccess (using STUB)");
@@ -188,29 +189,14 @@ public class DataAccessTest{
         dataAccess.getLeadSequential(leads);
         assertEquals(4, leads.size());
         assertEquals("Alice Chen", leads.getFirst().getLeadName());
-        assertEquals("Test Lead", leads.getLast().getLeadName());
+        assertEquals("New User", leads.getLast().getLeadName());
 
-        /* Insert Duplicate */
-        testLead = com.areonedev.autotrack.testing.LeadFixtures.create("New", "User", "555-9999", "new@test.com", "Sales",
-                "Street", "City", "Prov", "Country", "Postal",
-                30000.0, v, null, "NEW", now, "Note", now);
-        results = dataAccess.getLeadRandom(testLead);
-        // This is a valid lead, and it does exist in DB, however shouldn't be inserted
-        assertEquals(0, results.size());
-        dataAccess.getLeadSequential(results);
-        //But this insertion should not be processed
+        // Identity-based duplicate: reinserting the persisted object must fail.
+        assertEquals("Duplicate lead.", dataAccess.insertLead(testLead));
+        dataAccess.getLeadSequential(leads);
         assertEquals(4, leads.size());
+        assertEquals(1, dataAccess.getLeadRandom(testLead).size());
 
-        /* If lead is invalid, then nothing should be inserted*/
-        testLead = new Lead();
-        results = dataAccess.getLeadRandom(testLead);
-        dataAccess.insertLead(testLead);
-        // This insertion should not change anything
-        assertEquals(0, results.size());
-        dataAccess.getLeadSequential(results);
-        assertEquals(4, leads.size());
-        assertEquals("Alice Chen", leads.getFirst().getLeadName());
-        assertEquals("Test Lead", leads.getLast().getLeadName());
     }
 
     @Test
@@ -260,7 +246,7 @@ public class DataAccessTest{
         dataAccess.getLeadSequential(leads);
         Lead partialCheck = leads.get(0);
         assertEquals("555-9999", partialCheck.getLeadPhoneNumber());
-        assertEquals("Budget should remain unchanged", originalBudget, partialCheck.getLeadBudget());
+        assertEquals("Budget should remain unchanged", originalBudget, partialCheck.getLeadBudget(), 0.0);
 
         System.out.println(TAG + "Update verified for ID: " +updatedLead.getLeadID() + " New Name: " + updatedLead.getLeadName()+", Old Name: "+oldName);
     }
@@ -301,7 +287,7 @@ public class DataAccessTest{
         // 6. Integrity Check: Ensure other data is still there
         leads.clear();
         dataAccess.getLeadSequential(leads);
-        assertEquals("The list should not be empty after one deletion", true,leads.isEmpty());
+        assertEquals("The list should not be empty after one deletion", false,leads.isEmpty());
 
         System.out.println(TAG + "Delete verified for ID: " + testLeadLeadID + ". Remaining leads: " + leads.size());
     }

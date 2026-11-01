@@ -2,6 +2,13 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// Keep suite entry points for IDE use; Gradle discovers each concrete class once.
+tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+    exclude("**/RunUnitTests.class", "**/RunIntegrationTests.class",
+        "**/BusinessTests.class", "**/ObjectTests.class",
+        "**/PersistenceTests.class", "**/IntegrationTests.class")
+}
+
 android {
     namespace = "com.areonedev.autotrack"
     compileSdk = 35

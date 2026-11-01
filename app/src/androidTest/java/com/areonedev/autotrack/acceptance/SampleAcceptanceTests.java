@@ -23,6 +23,7 @@ import com.areonedev.autotrack.presentation.MainActivity;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
+@Ignore("Splash initializes the customer database; run only after a dedicated test application flavor exists. See LeadWorkflowTest for isolated UI coverage.")
 public class SampleAcceptanceTests {
     @Rule
     //public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<>(MainActivity.class);

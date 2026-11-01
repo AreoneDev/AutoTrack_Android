@@ -51,8 +51,9 @@ public class LeadTest extends TestCase {
         Lead lead1 = com.areonedev.autotrack.testing.LeadFixtures.create("Alice", "Chen", "111", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
         Lead lead2 = com.areonedev.autotrack.testing.LeadFixtures.create("Bob", "Smith", "222", null, null, null, null, null, null, null, 0, null, null, "NEW", now, "", now);
 
-        // IDs should NOT be the same
-        assertFalse("Each lead should have a unique ID", lead1.getLeadID() == lead2.getLeadID());
+        // SQLite assigns identity on insert; transient entities have no identity yet.
+        assertEquals(0L, lead1.getLeadID());
+        assertEquals(0L, lead2.getLeadID());
 
         System.out.println(TAG+ " test testLeadGeneration finished.");
     }
