@@ -1,0 +1,29 @@
+<resources>
+    <string name="auth_title">Sign in to AutoTrack</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_continue">Continue</string>
+    <string name="auth_first_name">First name</string>
+    <string name="auth_last_name">Last name</string>
+    <string name="auth_phone">Phone number</string>
+    <string name="auth_profile_required">Enter your first name, last name, and phone number.</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_register">Sign up</string>
+    <string name="auth_create_account">Create an account</string>
+    <string name="auth_back_to_login">Back to sign in</string>
+    <string name="auth_registration_hint">Enter your email and a password to create an account.</string>
+    <string name="auth_registration_failed">Unable to create an account. Check your details or try signing in.</string>
+    <string name="auth_confirmation_required">If your account can be created, check your email for a confirmation link.</string>
+    <string name="auth_sign_out">Sign out</string>
+    <string name="auth_retry_logout">Retry sign out</string>
+    <string name="auth_logout_pending">Your account is locked, but this device could not clear the saved session. Retry sign out before closing the app.</string>
+    <string name="auth_remote_logout_failed">The saved session was removed from this device, but the server could not confirm sign out.</string>
+    <string name="auth_checking">Checking your session…</string>
+    <string name="auth_password_hint">Use your existing AutoTrack email and password.</string>
+    <string name="auth_credentials_required">Enter your email and password.</string>
+    <string name="auth_credentials_rejected">Sign in failed. Check your credentials and email confirmation.</string>
+    <string name="auth_login_failed">Unable to sign in securely. Please try again.</string>
+    <string name="auth_restore_failed">Unable to restore your session. Check your connection or sign in again.</string>
+    <string name="auth_storage_failed">Unable to open your account data. Please try again.</string>
+    <string name="auth_configuration_missing">Sign in is unavailable in this build. Configure the Supabase project URL and publishable key.</string>
+</resources>

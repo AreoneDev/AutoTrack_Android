@@ -13,7 +13,7 @@ import com.areonedev.autotrack.objects.Vehicle;
 
 import java.util.Date;
 
-public class LeadsCreationActivity extends AppCompatActivity {
+public class LeadsCreationActivity extends AccountActivity {
     private EditText etFirstName, etLastName, etPhone, etEmail, etMake, etModel, etYear,etTrim,etNotes;
     private Button btnSave;
     private AccessLeads accessLeads;
@@ -21,6 +21,7 @@ public class LeadsCreationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!com.areonedev.autotrack.auth.AuthRuntime.requireAccount(this)) return;
         setContentView(R.layout.activity_leads_creation);
 
 

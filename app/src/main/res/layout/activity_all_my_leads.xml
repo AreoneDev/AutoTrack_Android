@@ -29,7 +29,12 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <!-- Subtitle removed from here -->
+        <Button
+            android:id="@id/auth_sign_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/auth_sign_out" />
     </LinearLayout>
 
     <!-- 2. Search Bar BELOW the title container -->

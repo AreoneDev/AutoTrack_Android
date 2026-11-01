@@ -14,7 +14,7 @@ public class IsolatedDatabase extends ExternalResource {
     public DataAccessObject dao;
     public File file;
     private String previousPath;
-    @Override protected void before() {
+    @Override protected void before() throws Throwable {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Services.closeDataAccess();
         Services.initialize(context);
@@ -23,9 +23,13 @@ public class IsolatedDatabase extends ExternalResource {
         Main.setDBPathName(file.getAbsolutePath());
         dao = new DataAccessObject(file.getAbsolutePath());
         Services.createDataAccess(dao);
+        String syntheticUser = UUID.randomUUID().toString();
+        Services.bindAccount(syntheticUser);
+        com.areonedev.autotrack.auth.SyntheticAccount.install(syntheticUser);
     }
     @Override protected void after() {
         Services.closeDataAccess();
+        com.areonedev.autotrack.auth.SyntheticAccount.reset();
         Main.setDBPathName(previousPath);
         if (file != null) android.database.sqlite.SQLiteDatabase.deleteDatabase(file);
     }

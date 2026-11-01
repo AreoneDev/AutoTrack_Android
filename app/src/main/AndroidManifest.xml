@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Permissions for Phone and SMS detection -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
@@ -25,6 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AutoTrack"
         tools:targetApi="31">
+
+        <activity android:name=".presentation.LoginActivity" android:exported="false" />
 
         <!-- Register the Receiver to listen for Phone and SMS events -->
         <receiver

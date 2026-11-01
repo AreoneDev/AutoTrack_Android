@@ -1,5 +1,12 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
+}
+
+val localSettings = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.isFile) localFile.inputStream().use { load(it) }
 }
 
 // Keep suite entry points for IDE use; Gradle discovers each concrete class once.
@@ -10,6 +17,7 @@ tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
 }
 
 android {
+    buildFeatures { buildConfig = true }
     namespace = "com.areonedev.autotrack"
     compileSdk = 35
 
@@ -21,9 +29,17 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        fun publicSetting(name: String): String = providers.gradleProperty(name)
+            .orElse(providers.environmentVariable(name)).orElse(localSettings.getProperty(name, "")).get()
+            .replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "").replace("\r", "")
+        buildConfigField("String", "SUPABASE_URL", "\"${publicSetting("SUPABASE_URL")}\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"${publicSetting("SUPABASE_PUBLISHABLE_KEY")}\"")
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(

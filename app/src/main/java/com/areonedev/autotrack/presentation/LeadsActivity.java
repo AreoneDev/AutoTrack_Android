@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LeadsActivity extends AppCompatActivity {
+public class LeadsActivity extends AccountActivity {
     private static final String TAG = "LeadsActivity";
 
     private RecyclerView recyclerView;
@@ -51,7 +51,9 @@ public class LeadsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!com.areonedev.autotrack.auth.AuthRuntime.requireAccount(this)) return;
         setContentView(R.layout.activity_all_my_leads);
+        findViewById(R.id.auth_sign_out).setOnClickListener(view -> signOutAccount());
 
         accessLeads = new AccessLeads();
 
@@ -302,6 +304,7 @@ public class LeadsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!com.areonedev.autotrack.auth.AuthRuntime.hasAccount()) return;
         applyFilters(); // Refresh list when returning to activity
     }
 }

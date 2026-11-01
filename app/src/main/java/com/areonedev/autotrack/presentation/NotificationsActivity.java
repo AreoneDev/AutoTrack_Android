@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class NotificationsActivity extends AppCompatActivity {
+public class NotificationsActivity extends AccountActivity {
     private static final String TAG = "NotificationActivity";
     private RecyclerView rvNotifications;
     private NotificationAdapter adapter;
@@ -30,6 +30,7 @@ public class NotificationsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!com.areonedev.autotrack.auth.AuthRuntime.requireAccount(this)) return;
         setContentView(R.layout.activity_notifications);
 
         initViews();
@@ -107,6 +108,7 @@ public class NotificationsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!com.areonedev.autotrack.auth.AuthRuntime.hasAccount()) return;
         // Refresh list when returning to this page
         loadNotifications();
     }

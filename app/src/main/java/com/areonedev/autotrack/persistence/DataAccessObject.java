@@ -38,11 +38,19 @@ public class DataAccessObject implements DataAccess {
     private static final String TABLE_TASKS = "Tasks";
     private static final String TABLE_VEHICLES = "Vehicles";
     private CryptoManager cryptoManager;
+    private final boolean seedDemoData;
 
     public DataAccessObject(String dbName) {
+        this(dbName, true);
+    }
+
+    public DataAccessObject(String dbName, boolean seedDemoData) {
         this.dbName = dbName;
+        this.seedDemoData = seedDemoData;
         this.cryptoManager = new CryptoManager();
     }
+
+    public boolean isOpen() { return db != null && db.isOpen(); }
 
     @Override
     public void open(String dbPath) {
@@ -117,7 +125,7 @@ public class DataAccessObject implements DataAccess {
             /* Insert three leads to the DB */
             int count = getTableCount(TABLE_LEADS);
 
-            if (count == 0) {
+            if (count == 0 && seedDemoData) {
                 Log.d(TAG, "Database is empty. Adding initial dummy leads.");
                 addDummyLeads();
             } else {
@@ -125,7 +133,7 @@ public class DataAccessObject implements DataAccess {
             }
 
             count = getTableCount(TABLE_NOTIFICATIONS);
-            if (count == 0) {
+            if (count == 0 && seedDemoData) {
                 addDummyNotifications();
             } else {
                 Log.d(TAG, "Database already contains " + count + " notifications. Skipping dummy data.");

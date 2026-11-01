@@ -17,6 +17,7 @@ public class LeadInteractionReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (!com.areonedev.autotrack.auth.AuthRuntime.hasAccount()) return;
         String contactInfo = null;
         String interactionType = "";
 

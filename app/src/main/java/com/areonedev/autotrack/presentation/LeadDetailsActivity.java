@@ -42,7 +42,7 @@ import java.util.Locale;
 import java.util.Calendar;
 import java.util.ArrayList;
 
-public class LeadDetailsActivity extends AppCompatActivity {
+public class LeadDetailsActivity extends AccountActivity {
 
     // Layout Containers
     private LinearLayout layoutViewMode, llStatusToggle,layoutEditMode;
@@ -69,6 +69,7 @@ public class LeadDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!com.areonedev.autotrack.auth.AuthRuntime.requireAccount(this)) return;
         setContentView(R.layout.activity_lead_details);
 
         scoringService = new ScoringService();
@@ -509,7 +510,7 @@ public class LeadDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_lead_details, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
