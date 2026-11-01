@@ -28,31 +28,10 @@ public class BusinessPersistenceSeamTest {
     private static final String dbName = Main.dbName;
     private static final String TAG = "BusinessPersistenceSeamTest";
 
-    @Before
-    public void setUp() throws Exception {
-        // 1. Get the REAL Android path
-        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        String dbPath = context.getDatabasePath(dbName).getAbsolutePath();
+    @org.junit.Rule public com.areonedev.autotrack.testing.IsolatedDatabase database = new com.areonedev.autotrack.testing.IsolatedDatabase();
 
-//        // 2. Initialize the REAL DataAccessObject
-//        DataAccess dao = new DataAccessObject(dbName);
-//        dao.open(dbPath);
-//
-//        // 3. Inject into Services
-//        Services.closeDataAccess();
-//        Services.createDataAccess(dao);
-
-        // 2. CRITICAL: Delete the existing database file to ensure a clean slate
-        // This prevents data from previous tests (like 'Test Lead') from interfering
-        context.deleteDatabase(dbName);
-
-        Services.createDataAccess(dbName);
-        DataAccess dao = Services.getDataAccess(dbName);
-        if (dao != null) {
-            dao.open(dbPath);
-        }
-
-        al = new AccessLeads(); // Business controller now talks to REAL DB
+    @Before public void setUp() {
+        al = new AccessLeads();
     }
 
     @Test
