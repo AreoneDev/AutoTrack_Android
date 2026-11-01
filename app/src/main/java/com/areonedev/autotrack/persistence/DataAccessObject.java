@@ -43,6 +43,7 @@ public class DataAccessObject implements DataAccess {
     private static final String TABLE_TASKS = "Tasks";
     private static final String TABLE_VEHICLES = "Vehicles";
     private CryptoManager cryptoManager;
+    private CryptoManager accountCrypto;
     private final boolean seedDemoData;
     private final String ownerId;
     private LeadIdentityStore identities;
@@ -61,7 +62,8 @@ public class DataAccessObject implements DataAccess {
         this.dbName = dbName;
         this.seedDemoData = seedDemoData;
         this.ownerId = ownerId;
-        this.cryptoManager = new CryptoManager(ownerId != null);
+        this.cryptoManager = new CryptoManager();
+        this.accountCrypto = ownerId == null ? null : new CryptoManager(true);
     }
 
     public boolean isOpen() { return db != null && db.isOpen(); }
@@ -286,10 +288,13 @@ public class DataAccessObject implements DataAccess {
         db.delete("Notifications","LeadID=?",new String[]{Long.toString(localId)});
         db.delete("Leads","LeadID=?",new String[]{Long.toString(localId)});
     }
-    @Override public LeadIdentity getLeadIdentity(long localId) { return identities().get(localId); }
+    @Override public LeadIdentity getLeadIdentity(long localId) {
+        LeadIdentity identity=identities().get(localId);if(sync!=null) sync.pinIdentity(localId);return identity;
+    }
     @Override public LeadIdentity findLeadIdentity(String syncId) { return identities().find(syncId); }
     @Override public void bindLeadIdentity(long localId, String syncId, long cloudId, long version) {
-        identities().bind(localId, syncId, cloudId, version);
+        if(sync!=null) sync.bind(localId,syncId,cloudId,version);
+        else identities().bind(localId, syncId, cloudId, version);
     }
 
     @Override
@@ -361,12 +366,12 @@ public class DataAccessObject implements DataAccess {
             if(sync!=null && !applyingRemote) {
                 identities.get(lead.getLeadID());sync.changed(lead.getLeadID(),true);
             }
-            int rows=db.delete(TABLE_LEADS,"LeadID=?",new String[]{Long.toString(lead.getLeadID())});
-            if(rows!=1) return "Customer not found.";
             if(sync!=null) {
                 db.delete("Tasks","LeadID=?",new String[]{Long.toString(lead.getLeadID())});
                 db.delete("Notifications","LeadID=?",new String[]{Long.toString(lead.getLeadID())});
             }
+            int rows=db.delete(TABLE_LEADS,"LeadID=?",new String[]{Long.toString(lead.getLeadID())});
+            if(rows!=1) return "Customer not found.";
             db.setTransactionSuccessful();return null;
         } catch(Exception error) { return "Unable to delete customer."; }
         finally { db.endTransaction();requestSync(); }
@@ -376,16 +381,25 @@ public class DataAccessObject implements DataAccess {
         if(sync!=null && !applyingRemote) com.areonedev.autotrack.sync.SyncRuntime.request(context);
     }
 
+    private CryptoManager writeCrypto() {return accountCrypto==null?cryptoManager:accountCrypto;}
+    public void syncValidateLocal(long localId) {
+        if(accountCrypto==null) throw new IllegalStateException("An account database is required.");
+        try(Cursor c=db.rawQuery("SELECT FirstName,LastName,PhoneNumber,Email FROM Leads WHERE LeadID=?",new String[]{Long.toString(localId)})) {
+            if(!c.moveToFirst()) throw new IllegalStateException("Customer unavailable.");
+            for(int column=0;column<4;column++) accountCrypto.decrypt(c.getString(column));
+        }
+    }
+
     /**
      * Helper to map Lead object to ContentValues for Insert/Update
      */
     private ContentValues getLeadContentValues(Lead lead) {
         ContentValues values = new ContentValues();
         // Encrypt sensitive PII fields
-        values.put("FirstName", cryptoManager.encrypt(lead.getLeadFirstName()));
-        values.put("LastName", cryptoManager.encrypt(lead.getLeadLastName()));
-        values.put("PhoneNumber", cryptoManager.encrypt(lead.getLeadPhoneNumber()));
-        values.put("Email", cryptoManager.encrypt(lead.getLeadEmail()));
+        values.put("FirstName", writeCrypto().encrypt(lead.getLeadFirstName()));
+        values.put("LastName", writeCrypto().encrypt(lead.getLeadLastName()));
+        values.put("PhoneNumber", writeCrypto().encrypt(lead.getLeadPhoneNumber()));
+        values.put("Email", writeCrypto().encrypt(lead.getLeadEmail()));
 
         //Non-sensitive fields remain plain text
         values.put("Division", lead.getLeadDivision());

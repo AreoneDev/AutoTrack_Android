@@ -19,9 +19,11 @@ public final class OfflineLeadStore {
     private final LeadMapper mapper = new LeadMapper(TimeZone.getDefault());
     public OfflineLeadStore(SQLiteDatabase db,String owner,DataAccessObject dao,LeadIdentityStore identities) {
         this.db=db;this.owner=owner;this.dao=dao;this.identities=identities;cipher=new SyncCipher(owner);
+        db.execSQL("CREATE TABLE IF NOT EXISTS SyncIdentityPins(LocalID INTEGER PRIMARY KEY)");
         db.execSQL("CREATE TABLE IF NOT EXISTS SyncState(LocalID INTEGER PRIMARY KEY, SyncID TEXT NOT NULL UNIQUE, Revision INTEGER NOT NULL, Kind TEXT NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS SyncOutbox(OperationID TEXT PRIMARY KEY, LocalID INTEGER NOT NULL UNIQUE, Revision INTEGER NOT NULL, Payload TEXT NOT NULL, Conflict TEXT, Sent INTEGER NOT NULL DEFAULT 0)");
     }
+    public void pinIdentity(long localId) {db.execSQL("INSERT OR IGNORE INTO SyncIdentityPins(LocalID) VALUES(?)",new Object[]{localId});}
     public void requireOwner(String value) { if(!owner.equals(value)) throw new IllegalStateException("Wrong sync account."); }
     /** Caller must hold the business transaction, including for a local deletion. */
     public void changed(long localId,boolean deleted) {
@@ -48,6 +50,7 @@ public final class OfflineLeadStore {
         LeadIdentity id=identity(localId);
         JSONObject body=new JSONObject().put("operation_id",operationId).put("sync_id",id.syncId).put("base_version",id.baseVersion).put("kind",kind);
         if(!kind.equals("delete")) {
+            dao.syncValidateLocal(localId);
             Lead criteria=new Lead();criteria.setLeadID(localId);List<Lead> rows=dao.getLeadRandom(criteria);
             if(rows.size()!=1) throw new IllegalStateException("Pending customer unavailable.");
             Lead lead=rows.get(0);Map<String,Object> fields=mapper.toCloudRow(lead);
@@ -143,6 +146,27 @@ public final class OfflineLeadStore {
         lead.setTradeInVehicle(mapper.vehicleFromRow(optionalMap(row,"trade_in")));
         long localId=dao.syncSaveLocal(lead,id==null);
         identities.bind(localId,sync,row.getLong("lead_id"),version);
+    }
+    /** A newly reserved, never-exposed queue identity may be bound by the existing mapping API. */
+    public void bind(long localId,String syncId,long cloudId,long version) {
+        db.beginTransaction();
+        try {
+            LeadIdentity current=identity(localId);
+            if(!current.syncId.equals(syncId)) {
+                if(!UUID.fromString(syncId).toString().equals(syncId) || cloudId<=0 || version<=0) throw new IllegalArgumentException("Invalid remote identity.");
+                boolean reserved;
+                try(Cursor c=db.rawQuery("SELECT Sent FROM SyncOutbox WHERE LocalID=?",new String[]{Long.toString(localId)})) {reserved=c.moveToFirst() && c.getInt(0)==0;}
+                try(Cursor c=db.rawQuery("SELECT 1 FROM SyncIdentityPins WHERE LocalID=?",new String[]{Long.toString(localId)})) {if(c.moveToFirst()) reserved=false;}
+                if(current.cloudId!=null || current.baseVersion!=0 || !reserved) throw new IllegalStateException("Record identity changed.");
+                db.execSQL("UPDATE LeadIdentities SET SyncID=? WHERE OwnerID=? AND LocalID=?",new Object[]{syncId,owner,localId});
+                db.execSQL("UPDATE SyncState SET SyncID=? WHERE LocalID=?",new Object[]{syncId,localId});
+                db.delete("SyncOutbox","LocalID=?",new String[]{Long.toString(localId)});
+                identities.bind(localId,syncId,cloudId,version);freeze(localId);
+            } else identities.bind(localId,syncId,cloudId,version);
+            db.setTransactionSuccessful();
+        } catch(RuntimeException failure) {throw failure;}
+        catch(Exception failure) {throw new IllegalStateException("Unable to bind queued identity.",failure);}
+        finally {db.endTransaction();}
     }
     public void resolve(String account,String operationId,boolean keepLocal) throws Exception {
         requireOwner(account);db.beginTransaction();

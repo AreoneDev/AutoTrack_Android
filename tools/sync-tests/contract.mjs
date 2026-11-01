@@ -7,7 +7,8 @@ const read=path=>readFile(new URL(path,import.meta.url),'utf8');
 try {
  await db.exec(await read('./fixtures/base.sql'));
  await db.exec(await read('./fixtures/ownership.sql'));
- await db.exec(await read('../../supabase/migrations/20261101010000_offline_lead_sync.sql'));
+ const migration=await read('../../supabase/migrations/20261101010000_offline_lead_sync.sql');
+ await db.exec(migration);await db.exec(migration);
  await db.exec(`SET ROLE authenticated; SET request.jwt.claim.sub='00000000-0000-0000-0000-000000000001'`);
  const rpc=async op=>(await db.query('SELECT public.autotrack_sync_lead($1::jsonb) AS result',[JSON.stringify(op)])).rows[0].result;
  const snapshot=async()=> (await db.query('SELECT public.autotrack_sync_snapshot() AS result')).rows[0].result;

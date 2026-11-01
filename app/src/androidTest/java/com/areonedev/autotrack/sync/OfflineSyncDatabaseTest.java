@@ -95,6 +95,17 @@ public class OfflineSyncDatabaseTest {
         try(SQLiteDatabase raw=SQLiteDatabase.openDatabase(file.getPath(),null,0)) {raw.execSQL("DELETE FROM SyncOutbox");raw.execSQL("DELETE FROM SyncState");raw.execSQL("DELETE FROM LeadIdentities");raw.execSQL("UPDATE Leads SET FirstName='damaged-ciphertext'");}
         try {dao.syncPending(owner);fail("Corrupt customer data must block upload.");}catch(Exception expected) { }
     }
+    @Test public void localDeleteRemovesChildrenWithForeignKeysEnabled() throws Exception {
+        java.lang.reflect.Field field=DataAccessObject.class.getDeclaredField("db");field.setAccessible(true);((SQLiteDatabase)field.get(dao)).setForeignKeyConstraintsEnabled(true);
+        Lead l=lead();assertNull(dao.insertLead(l));
+        com.areonedev.autotrack.objects.Task task=new com.areonedev.autotrack.objects.Task(l,"Synthetic child",new Date());assertNull(dao.insertTask(task));
+        assertNull(dao.deleteLead(l));List<com.areonedev.autotrack.objects.Task> tasks=new ArrayList<>();assertNull(dao.getTaskSequential(tasks));assertTrue(tasks.isEmpty());
+    }
+    @Test public void sentQueueIdentityCannotBeRebound() throws Exception {
+        Lead l=lead();assertNull(dao.insertLead(l));SyncEngine.Operation op=dao.syncPending(owner).get(0);
+        try {dao.bindLeadIdentity(l.getLeadID(),UUID.randomUUID().toString(),99,1);fail();}catch(IllegalStateException expected) { }
+        assertEquals(op.body,dao.syncPending(owner).get(0).body);
+    }
     @Test public void wrongAccountCannotReadQueue() throws Exception { try { dao.syncPending(UUID.randomUUID().toString());fail(); } catch(IllegalStateException expected) { } }
     @Test public void localDeletionKeepsDurableIdentityAndDeleteOperation() throws Exception {
         Lead l=lead();assertNull(dao.insertLead(l));String sync=dao.getLeadIdentity(l.getLeadID()).syncId;
