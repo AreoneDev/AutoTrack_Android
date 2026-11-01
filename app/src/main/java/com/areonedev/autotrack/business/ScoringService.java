@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.Collections;
+import java.util.TimeZone;
 
 public class ScoringService {
     protected static final int THRESHOLD = 100;
@@ -140,7 +141,7 @@ public class ScoringService {
         long daysFromPivot = getDaysDiff(pivotCal, targetCal);
 
         // 48h Response Rule
-        if ("LEAD".equals(lead.getLastInteractionBy()) && daysFromPivot <= 2) {
+        if ("LEAD".equals(lead.getLastInteractionBy()) && daysFromPivot >= 0 && daysFromPivot <= 2) {
             return "🚨 URGENT: Lead replied. Respond within 48h!";
         }
 
@@ -245,7 +246,15 @@ public class ScoringService {
     }
 
     private long getDaysDiff(Calendar start, Calendar end) {
-        return TimeUnit.MILLISECONDS.toDays(end.getTimeInMillis() - start.getTimeInMillis());
+        return TimeUnit.MILLISECONDS.toDays(calendarDateMillis(end) - calendarDateMillis(start));
+    }
+
+    private long calendarDateMillis(Calendar date) {
+        // Compare local date fields in UTC so DST cannot shorten or lengthen a day.
+        Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        utc.clear();
+        utc.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
+        return utc.getTimeInMillis();
     }
 
     private void resetTime(Calendar cal) {
