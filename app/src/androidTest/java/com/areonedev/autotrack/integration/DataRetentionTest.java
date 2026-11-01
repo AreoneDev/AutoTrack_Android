@@ -23,4 +23,14 @@ public class DataRetentionTest {
         assertNull(database.dao.getLeadSequential(leads));
         assertTrue("Deleted customers must not reappear on reopen", leads.isEmpty());
     }
+
+    @Test public void deletedDemoNotificationsDoNotReappearAfterReopen() {
+        List<com.areonedev.autotrack.objects.Notification> notifications = database.dao.getAllNotifications();
+        assertFalse("Fresh demo database must contain notifications", notifications.isEmpty());
+        for (com.areonedev.autotrack.objects.Notification notification : notifications)
+            assertNull(database.dao.deleteNotification(notification));
+        database.dao.close();
+        database.dao.open(database.file.getAbsolutePath());
+        assertTrue("Deleted notifications must not reappear on reopen", database.dao.getAllNotifications().isEmpty());
+    }
 }

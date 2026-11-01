@@ -24,6 +24,16 @@ public interface DataAccess {
 
     String deleteLead(Lead lead);
 
+    default com.areonedev.autotrack.mapping.LeadIdentity getLeadIdentity(long localId) {
+        throw new UnsupportedOperationException("Lead mapping is unavailable.");
+    }
+    default com.areonedev.autotrack.mapping.LeadIdentity findLeadIdentity(String syncId) {
+        throw new UnsupportedOperationException("Lead mapping is unavailable.");
+    }
+    default void bindLeadIdentity(long localId, String syncId, long cloudId, long version) {
+        throw new UnsupportedOperationException("Lead mapping is unavailable.");
+    }
+
     /*** Notification ***/
     String getNotificationSequential(List<Notification>notificationResult);
     ArrayList<Notification>getNotificationRandom(Notification notification);

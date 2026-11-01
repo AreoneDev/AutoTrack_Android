@@ -24,6 +24,11 @@ import com.areonedev.autotrack.objects.Lead;
 import com.areonedev.autotrack.objects.Task;
 import com.areonedev.autotrack.objects.Vehicle;
 import com.areonedev.autotrack.objects.Notification;
+import com.areonedev.autotrack.mapping.LeadIdentity;
+import com.areonedev.autotrack.mapping.LeadIdentityStore;
+import com.areonedev.autotrack.mapping.LeadMappingSchema;
+import com.areonedev.autotrack.mapping.LeadMapper;
+import java.util.TimeZone;
 
 public class DataAccessObject implements DataAccess {
     private SQLiteDatabase db;
@@ -39,14 +44,21 @@ public class DataAccessObject implements DataAccess {
     private static final String TABLE_VEHICLES = "Vehicles";
     private CryptoManager cryptoManager;
     private final boolean seedDemoData;
+    private final String ownerId;
+    private LeadIdentityStore identities;
 
     public DataAccessObject(String dbName) {
         this(dbName, true);
     }
 
     public DataAccessObject(String dbName, boolean seedDemoData) {
+        this(dbName, seedDemoData, null);
+    }
+
+    public DataAccessObject(String dbName, boolean seedDemoData, String ownerId) {
         this.dbName = dbName;
         this.seedDemoData = seedDemoData;
+        this.ownerId = ownerId;
         this.cryptoManager = new CryptoManager();
     }
 
@@ -72,74 +84,86 @@ public class DataAccessObject implements DataAccess {
             db = SQLiteDatabase.openOrCreateDatabase(dbPath, null);
             dbType = "SQLite";
 
-            // 3. Create Table (Matches Lead class fields)
-            db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_LEADS + " (" +
-                    "LeadID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "Status INTEGER DEFAULT 1, " +
-                    "FirstName TEXT, LastName TEXT, PhoneNumber TEXT, Email TEXT, " +
-                    "Division TEXT, Address TEXT, City TEXT, Province TEXT, " +
-                    "Country TEXT, PostalCode TEXT, Budget REAL, Stage TEXT, " +
-                    "Notes TEXT, FollowUpDate TEXT, CreatedAt TEXT, " +
-                    // Vehicle Interest Columns
-                    "VI_Make TEXT, VI_Model TEXT, VI_Year TEXT, VI_Trim TEXT, " +
-                    "VI_Price REAL, VI_Color TEXT, VI_InStock INTEGER, VI_VIN TEXT, VI_Trans TEXT, " +
-                    // Trade-In Vehicle Columns
-                    "TI_Make TEXT, TI_Model TEXT, TI_Year TEXT, TI_Trim TEXT, " +
-                    "TI_Price REAL, TI_Color TEXT, TI_InStock INTEGER, TI_VIN TEXT, TI_Trans TEXT" +
-                    ")");
+            db.beginTransaction();
+            try {
+                boolean initializeDemoData;
+                try (Cursor tables = db.rawQuery("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+                        new String[]{TABLE_LEADS})) {
+                    initializeDemoData = !tables.moveToFirst();
+                }
 
-            // 4. Create Notifications Table
-            db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NOTIFICATIONS + " (" +
-                    "NotificationID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "Title TEXT, " +
-                    "Timestamp INTEGER, " +
-                    "LeadID INTEGER" + // <--- Add this to link to TABLE_LEADS
-                    ")");
+                // 3. Create Table (Matches Lead class fields)
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_LEADS + " (" +
+                        "LeadID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "Status INTEGER DEFAULT 1, " +
+                        "FirstName TEXT, LastName TEXT, PhoneNumber TEXT, Email TEXT, " +
+                        "Division TEXT, Address TEXT, City TEXT, Province TEXT, " +
+                        "Country TEXT, PostalCode TEXT, Budget REAL, Stage TEXT, " +
+                        "Notes TEXT, FollowUpDate TEXT, CreatedAt TEXT, " +
+                        // Vehicle Interest Columns
+                        "VI_Make TEXT, VI_Model TEXT, VI_Year TEXT, VI_Trim TEXT, " +
+                        "VI_Price REAL, VI_Color TEXT, VI_InStock INTEGER, VI_VIN TEXT, VI_Trans TEXT, " +
+                        // Trade-In Vehicle Columns
+                        "TI_Make TEXT, TI_Model TEXT, TI_Year TEXT, TI_Trim TEXT, " +
+                        "TI_Price REAL, TI_Color TEXT, TI_InStock INTEGER, TI_VIN TEXT, TI_Trans TEXT" +
+                        ")");
 
-            //5. Create Tasks Table
-            db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_TASKS + " (" +
-                    "TaskID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "Title TEXT, " +
-                    "Timestamp INTEGER, " +
-                    "IsCompleted INTEGER, " +
-                    "LeadID INTEGER, " +
-                    "FOREIGN KEY(LeadID) REFERENCES " + TABLE_LEADS + "(LeadID)" +
-                    ")");
+                // 4. Create Notifications Table
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NOTIFICATIONS + " (" +
+                        "NotificationID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "Title TEXT, " +
+                        "Timestamp INTEGER, " +
+                        "LeadID INTEGER" + // <--- Add this to link to TABLE_LEADS
+                        ")");
 
-            //6. Create Vehicles Table
-            db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_VEHICLES + " (" +
-                    "VehicleID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "Make TEXT, " +
-                    "Model TEXT, " +
-                    "Year TEXT, " +
-                    "Trim TEXT, " +
-                    "Price REAL, " +
-                    "Color TEXT, " +
-                    "InStock INTEGER, " +
-                    "VIN TEXT, " +
-                    "Transmission TEXT" +
-                    ")");
+                //5. Create Tasks Table
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_TASKS + " (" +
+                        "TaskID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "Title TEXT, " +
+                        "Timestamp INTEGER, " +
+                        "IsCompleted INTEGER, " +
+                        "LeadID INTEGER, " +
+                        "FOREIGN KEY(LeadID) REFERENCES " + TABLE_LEADS + "(LeadID)" +
+                        ")");
 
-            Log.d(TAG, "Database opened successfully at: " + dbPath);
+                //6. Create Vehicles Table
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_VEHICLES + " (" +
+                        "VehicleID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "Make TEXT, " +
+                        "Model TEXT, " +
+                        "Year TEXT, " +
+                        "Trim TEXT, " +
+                        "Price REAL, " +
+                        "Color TEXT, " +
+                        "InStock INTEGER, " +
+                        "VIN TEXT, " +
+                        "Transmission TEXT" +
+                        ")");
 
-            /* Insert three leads to the DB */
-            int count = getTableCount(TABLE_LEADS);
+                LeadMappingSchema.migrate(db);
+                if (ownerId != null) identities = new LeadIdentityStore(db, ownerId);
+                Log.d(TAG, "Database opened successfully at: " + dbPath);
 
-            if (count == 0 && seedDemoData) {
-                Log.d(TAG, "Database is empty. Adding initial dummy leads.");
-                addDummyLeads();
-            } else {
-                Log.d(TAG, "Database already contains " + count + " leads. Skipping dummy data.");
-            }
+                // Seed only during initial schema creation, never when customers were deleted.
+                int count = getTableCount(TABLE_LEADS);
 
-            count = getTableCount(TABLE_NOTIFICATIONS);
-            if (count == 0 && seedDemoData) {
-                addDummyNotifications();
-            } else {
-                Log.d(TAG, "Database already contains " + count + " notifications. Skipping dummy data.");
-            }
+                if (initializeDemoData && seedDemoData) {
+                    Log.d(TAG, "Database is empty. Adding initial dummy leads.");
+                    addDummyLeads();
+                } else {
+                    Log.d(TAG, "Database already contains " + count + " leads. Skipping dummy data.");
+                }
 
-            count = getTableCount(TABLE_VEHICLES);
+                count = getTableCount(TABLE_NOTIFICATIONS);
+                if (initializeDemoData && seedDemoData) {
+                    addDummyNotifications();
+                } else {
+                    Log.d(TAG, "Database already contains " + count + " notifications. Skipping dummy data.");
+                }
+                db.setTransactionSuccessful();
+            } finally { db.endTransaction(); }
+
+            int count = getTableCount(TABLE_VEHICLES);
             if (count == 0) {
                 if (context != null) {
                     importVehiclesFromCSV();
@@ -150,6 +174,8 @@ public class DataAccessObject implements DataAccess {
 
         } catch (Exception e) {
             Log.e(TAG, "CRITICAL: Failed to open database: " + e.getMessage());
+            if (db != null && db.isOpen()) db.close();
+            identities = null;
             db = null; // Ensure it's explicitly null if it fails
         }
 
@@ -219,6 +245,17 @@ public class DataAccessObject implements DataAccess {
         if (db != null && db.isOpen()) {
             db.close();
         }
+        identities = null;
+    }
+
+    private LeadIdentityStore identities() {
+        if (!isOpen() || identities == null) throw new IllegalStateException("An account database is required.");
+        return identities;
+    }
+    @Override public LeadIdentity getLeadIdentity(long localId) { return identities().get(localId); }
+    @Override public LeadIdentity findLeadIdentity(String syncId) { return identities().find(syncId); }
+    @Override public void bindLeadIdentity(long localId, String syncId, long cloudId, long version) {
+        identities().bind(localId, syncId, cloudId, version);
     }
 
     @Override
@@ -268,6 +305,7 @@ public class DataAccessObject implements DataAccess {
 
             // IMPORTANT: Remove LeadID from values so SQLite generates a new one
             values.remove("LeadID");
+            values.put("MappingFieldsKnown", 1);
 
             long rowId = db.insert(TABLE_LEADS, null, values);
 
@@ -336,12 +374,16 @@ public class DataAccessObject implements DataAccess {
         values.put("Budget", lead.getLeadBudget());
         values.put("Stage", lead.getLeadStage());
         values.put("Notes", lead.getLeadNotes());
-        values.put("FollowUpDate", lead.getLeadFollowUpDate() != null ? formatter.format(lead.getLeadFollowUpDate()) : "");
-        values.put("CreatedAt", formatter.format(lead.getLeadCreatedAt()));
+        values.put("FollowUpDate", LeadMapper.instant(lead.getLeadFollowUpDate()));
+        values.put("CreatedAt", LeadMapper.instant(lead.getLeadCreatedAt()));
+        values.put("Score", lead.getLeadScore());
+        values.put("LastInteractionDate", LeadMapper.instant(lead.getLastInteractionDate()));
+        values.put("LastInteractionBy", lead.getLastInteractionBy());
         values.put("Status", lead.getLeadStatus() ? 1 : 0);
 
         // Flatten Vehicle Interest
         Vehicle vi = lead.getLeadVehicleInterest();
+        clearVehicle(values, "VI_");
         if (vi != null) {
             values.put("VI_Make", vi.getMake());
             values.put("VI_Model", vi.getModel());
@@ -356,6 +398,7 @@ public class DataAccessObject implements DataAccess {
 
         // Flatten Trade-In
         Vehicle ti = lead.getTradeInVehicle();
+        clearVehicle(values, "TI_");
         if (ti != null) {
             values.put("TI_Make", ti.getMake());
             values.put("TI_Model", ti.getModel());
@@ -371,6 +414,18 @@ public class DataAccessObject implements DataAccess {
         return values;
     }
 
+    private static void clearVehicle(ContentValues values, String prefix) {
+        for (String suffix : new String[]{"Make", "Model", "Year", "Trim", "Price", "Color", "InStock", "VIN", "Trans"})
+            values.putNull(prefix + suffix);
+    }
+
+    private static Date readLeadDate(String value) {
+        if (value == null || value.isEmpty()) return null;
+        if (value.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}"))
+            return LeadMapper.parse(value, "dd/MM/yyyy", TimeZone.getDefault());
+        return LeadMapper.parseInstant(value);
+    }
+
     public String processSQLError(Exception e) {
         String errorMsg = "*** SQL Error: " + e.getMessage();
         e.printStackTrace();
@@ -380,7 +435,7 @@ public class DataAccessObject implements DataAccess {
     private void parseCursor(Cursor cursor, List<Lead> list) throws Exception {
         if (cursor.moveToFirst()) {
             do {
-                // Use the No-Args constructor to avoid triggering "Today" defaults
+                // Every persisted date is assigned explicitly, including null values.
                 Lead lead = new Lead();
 
                 lead.setLeadID(cursor.getLong(cursor.getColumnIndexOrThrow("LeadID")));
@@ -402,6 +457,9 @@ public class DataAccessObject implements DataAccess {
                 lead.setLeadStage(cursor.getString(cursor.getColumnIndexOrThrow("Stage")));
                 lead.setLeadNotes(cursor.getString(cursor.getColumnIndexOrThrow("Notes")));
                 lead.setLeadStatus(cursor.getInt(cursor.getColumnIndexOrThrow("Status")) == 1);
+                lead.setLeadScore(cursor.getDouble(cursor.getColumnIndexOrThrow("Score")));
+                lead.setLastInteractionDate(readLeadDate(cursor.getString(cursor.getColumnIndexOrThrow("LastInteractionDate"))));
+                lead.setLastInteractionBy(cursor.getString(cursor.getColumnIndexOrThrow("LastInteractionBy")));
                 // 1. Reconstruct Vehicle Interest
                 int viYearIdx = cursor.getColumnIndexOrThrow("VI_Year");
                 int viMakeIdx = cursor.getColumnIndexOrThrow("VI_Make");
@@ -424,7 +482,8 @@ public class DataAccessObject implements DataAccess {
 
                 // 2. Reconstruct Trade-In
                 int tiMakeIdx = cursor.getColumnIndexOrThrow("TI_Make");
-                if (!cursor.isNull(tiMakeIdx)) {
+                if (!cursor.isNull(tiMakeIdx) || !cursor.isNull(cursor.getColumnIndexOrThrow("TI_Model"))
+                        || !cursor.isNull(cursor.getColumnIndexOrThrow("TI_Year"))) {
                     Vehicle ti = new Vehicle(
                             cursor.getString(tiMakeIdx),
                             cursor.getString(cursor.getColumnIndexOrThrow("TI_Model")),
@@ -441,14 +500,10 @@ public class DataAccessObject implements DataAccess {
 
                 // 3. Parse Dates from DB strings
                 String fDateStr = cursor.getString(cursor.getColumnIndexOrThrow("FollowUpDate"));
-                if (fDateStr != null && !fDateStr.isEmpty()) {
-                    lead.setLeadFollowUpDate(formatter.parse(fDateStr));
-                }
+                lead.setLeadFollowUpDate(readLeadDate(fDateStr));
 
                 String cDateStr = cursor.getString(cursor.getColumnIndexOrThrow("CreatedAt"));
-                if (cDateStr != null && !cDateStr.isEmpty()) {
-                    lead.setLeadCreatedAt(formatter.parse(cDateStr));
-                }
+                lead.setLeadCreatedAt(readLeadDate(cDateStr));
 
                 list.add(lead);
             } while (cursor.moveToNext());
@@ -471,13 +526,11 @@ public class DataAccessObject implements DataAccess {
 
         Calendar calendar = Calendar.getInstance();
 
-        /* --- HISTORICAL LEADS --- */
-        // We use the No-Args constructor here because we need to MANUALLY set
-        // the dates to April 1st/2nd. The second constructor would force them to "Today".
+        // Synthetic historical customers have explicit dates for the demo calendar.
 
-        // Darren (April 1st)
+        // Darren (May 1st)
         Lead demo1 = new Lead();
-        demo1.setLeadFirstName("Demo1");
+        demo1.setLeadFirstName("Darren");
         demo1.setLeadLastName("Customer");
         demo1.setLeadPhoneNumber("416-222-3333");
         demo1.setLeadVehicleInterest(jetta);
@@ -486,11 +539,11 @@ public class DataAccessObject implements DataAccess {
         demo1.setLeadCreatedAt(calendar.getTime());
         demo1.setLeadFollowUpDate(calendar.getTime());
         demo1.setLeadStage("NEW");
-        insertLead(demo1);
+        insertDemoLead(demo1);
 
-        // Darryl (April 2nd)
+        // Darryl (May 2nd)
         Lead demo2 = new Lead();
-        demo2.setLeadFirstName("Demo2");
+        demo2.setLeadFirstName("Darryl");
         demo2.setLeadLastName("Customer");
         demo2.setLeadPhoneNumber("647-111-2222");
         demo2.setLeadVehicleInterest(atlas);
@@ -498,27 +551,38 @@ public class DataAccessObject implements DataAccess {
         demo2.setLeadCreatedAt(calendar.getTime());
         demo2.setLeadFollowUpDate(calendar.getTime());
         demo2.setLeadStage("VISITED");
-        insertLead(demo2);
+        insertDemoLead(demo2);
 
         /* --- CURRENT LEADS (Using your SECOND constructor) --- */
         // These will automatically be set to Stage="NEW" and Date="Today"
         // because of the logic inside your new constructor.
 
-        // Pengyu Wang
+        // Synthetic current customers complete the six-record demo sequence.
         Lead demo3 = new Lead(
-                "Demo3", "Customer", "613-111-2222", "pengyu@example.com",
+                "Jamie", "Customer", "555-0103", "jamie@example.invalid",
                 "New Cars", "101 Elgin St", "Ottawa", "ON", "Canada", "K1P 5K7",
                 52000, atlas, null, "Interested in the new Atlas"
         );
-        insertLead(demo3);
+        insertDemoLead(demo3);
 
-        // Irfan Nassir
         Lead demo4 = new Lead(
-                "Demo4", "Customer", "416-777-8888", "irfan@example.com",
+                "Demo4", "Customer", "555-0104", "demo4@example.invalid",
                 "Fleet", "202 King St", "Toronto", "ON", "Canada", "M5V 1J2",
                 60000, tiguan, null, "Looking for fleet pricing"
         );
-        insertLead(demo4);
+        insertDemoLead(demo4);
+        for (String firstName : new String[]{"Morgan", "Taylor"}) {
+            Lead demo = new Lead();
+            demo.setLeadFirstName(firstName);
+            demo.setLeadLastName("Customer");
+            demo.setLeadNotes("Synthetic demo customer");
+            insertDemoLead(demo);
+        }
+    }
+
+    private void insertDemoLead(Lead lead) {
+        String error = insertLead(lead);
+        if (error != null) throw new IllegalStateException("Demo initialization failed.");
     }
 
 
@@ -667,7 +731,7 @@ public class DataAccessObject implements DataAccess {
             insertNotification(new Notification(leads.get(0), "Incoming Call from " + leads.get(0).getLeadFirstName(), new Date()));
 
             if (leads.size() > 2) {
-                // Link to the third lead (e.g., Pengyu Wang)
+                // Link to the third synthetic customer.
                 insertNotification(new Notification(leads.get(2), "New SMS from " + leads.get(2).getLeadFirstName(),
                         new Date(System.currentTimeMillis() - 3600000)));
             }

@@ -19,7 +19,7 @@ public class Services {
         if (appContext == null) throw new IllegalStateException("Application context is unavailable.");
         String path = appContext.getDatabasePath(filename).getAbsolutePath();
         Main.setDBPathName(path);
-        DataAccessObject database = new DataAccessObject(path, false);
+        DataAccessObject database = new DataAccessObject(path, false, userId);
         database.open(path);
         if (!database.isOpen()) throw new IllegalStateException("Account database unavailable.");
         dataAccessService = database;
