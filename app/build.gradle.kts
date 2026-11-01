@@ -67,8 +67,9 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.protolite.well.known.types)
-    implementation(libs.monitor)
     testImplementation(libs.junit)
+    testImplementation(libs.monitor)
+    androidTestImplementation(libs.monitor)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 

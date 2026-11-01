@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:gravity="center_vertical" android:padding="32dp">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/auth_title" android:textSize="28sp" android:layout_marginBottom="24dp" />
-        <EditText android:id="@+id/auth_email" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/auth_email" android:inputType="textEmailAddress" android:autofillHints="emailAddress"
-            android:singleLine="true" android:saveEnabled="false" />
-        <EditText android:id="@+id/auth_first_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/auth_first_name" android:inputType="textPersonName" android:visibility="gone" />
-        <EditText android:id="@+id/auth_last_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/auth_last_name" android:inputType="textPersonName" android:visibility="gone" />
-        <EditText android:id="@+id/auth_phone" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/auth_phone" android:inputType="phone" android:visibility="gone" />
-        <EditText android:id="@+id/auth_password" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/auth_password" android:inputType="textPassword" android:autofillHints="password"
-            android:singleLine="true" android:saveEnabled="false" android:visibility="gone" />
-        <Button android:id="@+id/auth_sign_in" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/auth_continue" android:layout_marginTop="16dp" />
-        <Button android:id="@+id/auth_retry_logout" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/auth_retry_logout" android:visibility="gone" />
-        <Button android:id="@+id/auth_switch_mode" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/auth_create_account" android:visibility="gone" />
-        <TextView android:id="@+id/auth_status" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:accessibilityLiveRegion="polite" android:layout_marginTop="16dp" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:id="@+id/auth_session_loading"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical" android:gravity="center" android:padding="32dp"
+        android:visibility="gone">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/app_name" android:textSize="28sp" android:layout_marginBottom="24dp" />
+        <ProgressBar android:layout_width="48dp" android:layout_height="48dp"
+            android:indeterminate="true" android:importantForAccessibility="no" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/auth_checking" android:layout_marginTop="24dp"
+            android:accessibilityLiveRegion="polite" />
     </LinearLayout>
-</ScrollView>
+    <ScrollView android:id="@+id/auth_form"
+        android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="center_vertical" android:padding="32dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/auth_title" android:textSize="28sp" android:layout_marginBottom="24dp" />
+            <EditText android:id="@+id/auth_email" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/auth_email" android:inputType="textEmailAddress" android:autofillHints="emailAddress"
+                android:singleLine="true" android:saveEnabled="false" />
+            <EditText android:id="@+id/auth_first_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/auth_first_name" android:inputType="textPersonName" android:visibility="gone" />
+            <EditText android:id="@+id/auth_last_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/auth_last_name" android:inputType="textPersonName" android:visibility="gone" />
+            <EditText android:id="@+id/auth_phone" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/auth_phone" android:inputType="phone" android:visibility="gone" />
+            <EditText android:id="@+id/auth_password" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/auth_password" android:inputType="textPassword" android:autofillHints="password"
+                android:singleLine="true" android:saveEnabled="false" android:visibility="gone" />
+            <Button android:id="@+id/auth_sign_in" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/auth_continue" android:layout_marginTop="16dp" />
+            <Button android:id="@+id/auth_retry_logout" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/auth_retry_logout" android:visibility="gone" />
+            <Button android:id="@+id/auth_switch_mode" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/auth_create_account" android:visibility="gone" />
+            <TextView android:id="@+id/auth_status" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:accessibilityLiveRegion="polite" android:layout_marginTop="16dp" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

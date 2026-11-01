@@ -55,6 +55,7 @@ public final class LoginActivity extends AppCompatActivity {
     }
     private void showLogoutPending() {
         setBusy(true);
+        setSessionChecking(false);
         status.setText(R.string.auth_logout_pending);
         retryLogout.setVisibility(android.view.View.VISIBLE);
         retryLogout.setEnabled(true);
@@ -138,9 +139,14 @@ public final class LoginActivity extends AppCompatActivity {
         }
     }
     private void setBusy(boolean value) {
+        setSessionChecking(value);
         busy = value; signIn.setEnabled(!value); email.setEnabled(!value); password.setEnabled(!value);
         switchMode.setEnabled(!value);
         status.setText(value ? R.string.auth_checking : R.string.auth_password_hint);
+    }
+    private void setSessionChecking(boolean checking) {
+        findViewById(R.id.auth_form).setVisibility(checking ? android.view.View.GONE : android.view.View.VISIBLE);
+        findViewById(R.id.auth_session_loading).setVisibility(checking ? android.view.View.VISIBLE : android.view.View.GONE);
     }
     private void showError(String message) {
         runOnUiThread(() -> {
