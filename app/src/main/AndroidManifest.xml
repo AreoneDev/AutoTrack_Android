@@ -27,6 +27,7 @@
         android:theme="@style/Theme.AutoTrack"
         tools:targetApi="31">
 
+        <activity android:name=".presentation.SyncActivity" android:exported="false" />
         <activity android:name=".presentation.LoginActivity" android:exported="false" />
 
         <!-- Register the Receiver to listen for Phone and SMS events -->

@@ -12,3 +12,7 @@ local.properties
 *.apk
 *.aab
 /app/release
+
+# Local synthetic synchronization harness dependencies and generated bundles.
+/tools/sync-tests/node_modules/
+/tools/sync-tests/generated/

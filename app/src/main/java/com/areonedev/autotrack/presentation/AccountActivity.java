@@ -12,14 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 public abstract class AccountActivity extends AppCompatActivity {
     @Override protected void onResume() {
         super.onResume();
-        AuthRuntime.requireAccount(this);
+        if(AuthRuntime.requireAccount(this)) com.areonedev.autotrack.sync.SyncRuntime.request(getApplicationContext());
     }
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, R.id.auth_sign_out, Menu.NONE, R.string.auth_sign_out)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add(Menu.NONE,R.id.sync_review,Menu.NONE,R.string.sync_review);
         return true;
     }
     @Override public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.sync_review) {startActivity(new Intent(this,SyncActivity.class));return true;}
         if (item.getItemId() != R.id.auth_sign_out) return super.onOptionsItemSelected(item);
         signOutAccount();
         return true;

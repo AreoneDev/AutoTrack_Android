@@ -1,0 +1,14 @@
+CREATE ROLE anon; CREATE ROLE authenticated; CREATE SCHEMA auth;
+CREATE TABLE auth.users(id uuid PRIMARY KEY,email text);
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+GRANT USAGE ON SCHEMA auth TO authenticated; GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated;
+INSERT INTO auth.users VALUES ('00000000-0000-0000-0000-000000000001','owner@example.invalid'),('00000000-0000-0000-0000-000000000002','other@example.invalid');
+CREATE TABLE public.leads(lead_id bigserial PRIMARY KEY,first_name text,last_name text,phone text,lead_email text,lead_division text,lead_address text,lead_city text,lead_province text,lead_country text,lead_postal_code text,budget numeric,stage text,follow_up_date timestamptz,score double precision,notes text,created_at timestamptz,last_interaction_date timestamptz,last_interaction_by text,status boolean);
+CREATE TABLE public.tasks(task_id bigserial PRIMARY KEY,lead_id bigint REFERENCES public.leads, title text, task_date timestamp,completed boolean);
+CREATE TABLE public.notifications(notification_id bigserial PRIMARY KEY,lead_id bigint REFERENCES public.leads,title text,date timestamptz);
+CREATE TABLE public.vehicles(vehicle_id bigserial PRIMARY KEY,make text,model text,year integer,trim text,price numeric,color text,in_stock boolean,vin text,transmission text);
+CREATE TABLE public.lead_vehicle_interests(lead_id bigint PRIMARY KEY REFERENCES public.leads,vehicle_id bigint REFERENCES public.vehicles,trim_override text,updated_at timestamptz);
+CREATE TABLE public.lead_trade_in_vehicles(LIKE public.lead_vehicle_interests INCLUDING ALL);
+ALTER TABLE public.lead_trade_in_vehicles ADD FOREIGN KEY(lead_id) REFERENCES public.leads;
+CREATE TABLE public.imported_cars(id bigint);
+GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;

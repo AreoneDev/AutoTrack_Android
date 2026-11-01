@@ -1,0 +1,14 @@
+<resources>
+    <item name="sync_review" type="id" />
+    <string name="sync_review">Synchronization</string>
+    <string name="sync_now">Synchronize and refresh</string>
+    <string name="sync_conflict">Review customer conflict</string>
+    <string name="sync_choose">Both devices changed this customer. Keep your current local copy or accept the server copy? Accepting the server discards your pending changes. A deleted server customer cannot be restored by keeping the local copy.</string>
+    <string name="sync_keep_local">Keep local</string>
+    <string name="sync_keep_remote">Accept server</string>
+    <string name="sync_unavailable">Synchronization unavailable. Your pending changes are retained.</string>
+    <string name="sync_resolution_failed">Unable to resolve this conflict. If deleted on the server, accept deletion or save a new customer.</string>
+    <string name="sync_customer_conflict">Review conflict: %1$s</string>
+    <string name="sync_deleted">Deleted</string>
+    <string name="sync_compare_notes">Local notes: %1$s\nServer notes: %2$s</string>
+</resources>

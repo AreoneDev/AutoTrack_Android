@@ -1,0 +1,1 @@
+{"private":true,"type":"module","scripts":{"test":"node contract.mjs","bridge":"node bridge.mjs"},"dependencies":{"@electric-sql/pglite":"0.3.14"}}

@@ -34,6 +34,12 @@ public interface DataAccess {
         throw new UnsupportedOperationException("Lead mapping is unavailable.");
     }
 
+    default java.util.List<com.areonedev.autotrack.sync.SyncEngine.Operation> syncPending(String owner) throws Exception { throw new UnsupportedOperationException(); }
+    default void syncAcknowledge(String owner,com.areonedev.autotrack.sync.SyncEngine.Operation op,String response) throws Exception { throw new UnsupportedOperationException(); }
+    default void syncApply(String owner,String snapshot) throws Exception { throw new UnsupportedOperationException(); }
+    default java.util.List<String> syncConflicts(String owner) throws Exception { throw new UnsupportedOperationException(); }
+    default void syncResolve(String owner,String operationId,boolean keepLocal) throws Exception { throw new UnsupportedOperationException(); }
+
     /*** Notification ***/
     String getNotificationSequential(List<Notification>notificationResult);
     ArrayList<Notification>getNotificationRandom(Notification notification);

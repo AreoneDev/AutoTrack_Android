@@ -54,6 +54,7 @@ public class LeadsActivity extends AccountActivity {
         if (!com.areonedev.autotrack.auth.AuthRuntime.requireAccount(this)) return;
         setContentView(R.layout.activity_all_my_leads);
         findViewById(R.id.auth_sign_out).setOnClickListener(view -> signOutAccount());
+        findViewById(R.id.sync_review).setOnClickListener(view -> startActivity(new Intent(this,SyncActivity.class)));
 
         accessLeads = new AccessLeads();
 

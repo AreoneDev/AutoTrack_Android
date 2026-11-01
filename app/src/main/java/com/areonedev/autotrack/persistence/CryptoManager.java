@@ -14,10 +14,14 @@ public class CryptoManager {
     private static final String ANDROID_KEYSTORE = "AndroidKeyStore";
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
 
-    public CryptoManager() {
+    private final boolean failClosed;
+    public CryptoManager() { this(false); }
+    public CryptoManager(boolean failClosed) {
+        this.failClosed=failClosed;
         try {
             initKey();
         } catch (Exception e) {
+            if(failClosed) throw new IllegalStateException("Account encryption is unavailable.");
             e.printStackTrace();
         }
     }
@@ -54,6 +58,7 @@ public class CryptoManager {
             System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
             return Base64.encodeToString(combined, Base64.DEFAULT);
         } catch (Exception e) {
+            if(failClosed) throw new IllegalStateException("Account encryption failed.");
             return data; // Fallback to plain text if encryption fails
         }
     }
@@ -73,6 +78,7 @@ public class CryptoManager {
             byte[] decrypted = cipher.doFinal(combined, 12, combined.length - 12);
             return new String(decrypted, "UTF-8");
         } catch (Exception e) {
+            if(failClosed) throw new IllegalStateException("Account ciphertext is unavailable or damaged.");
             return encryptedData; // Return as-is if it wasn't encrypted
         }
     }

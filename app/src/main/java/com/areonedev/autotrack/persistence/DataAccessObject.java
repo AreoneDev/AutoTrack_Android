@@ -46,6 +46,8 @@ public class DataAccessObject implements DataAccess {
     private final boolean seedDemoData;
     private final String ownerId;
     private LeadIdentityStore identities;
+    private com.areonedev.autotrack.sync.OfflineLeadStore sync;
+    private boolean applyingRemote;
 
     public DataAccessObject(String dbName) {
         this(dbName, true);
@@ -59,7 +61,7 @@ public class DataAccessObject implements DataAccess {
         this.dbName = dbName;
         this.seedDemoData = seedDemoData;
         this.ownerId = ownerId;
-        this.cryptoManager = new CryptoManager();
+        this.cryptoManager = new CryptoManager(ownerId != null);
     }
 
     public boolean isOpen() { return db != null && db.isOpen(); }
@@ -141,7 +143,10 @@ public class DataAccessObject implements DataAccess {
                         ")");
 
                 LeadMappingSchema.migrate(db);
-                if (ownerId != null) identities = new LeadIdentityStore(db, ownerId);
+                if (ownerId != null) {
+                    identities = new LeadIdentityStore(db, ownerId);
+                    sync = new com.areonedev.autotrack.sync.OfflineLeadStore(db,ownerId,this,identities);
+                }
                 Log.d(TAG, "Database opened successfully at: " + dbPath);
 
                 // Seed only during initial schema creation, never when customers were deleted.
@@ -176,6 +181,7 @@ public class DataAccessObject implements DataAccess {
             Log.e(TAG, "CRITICAL: Failed to open database: " + e.getMessage());
             if (db != null && db.isOpen()) db.close();
             identities = null;
+        sync = null;
             db = null; // Ensure it's explicitly null if it fails
         }
 
@@ -246,11 +252,39 @@ public class DataAccessObject implements DataAccess {
             db.close();
         }
         identities = null;
+        sync = null;
     }
 
     private LeadIdentityStore identities() {
         if (!isOpen() || identities == null) throw new IllegalStateException("An account database is required.");
         return identities;
+    }
+    private com.areonedev.autotrack.sync.OfflineLeadStore sync(String owner) {
+        if(!isOpen() || sync==null) throw new IllegalStateException("An account database is required.");
+        sync.requireOwner(owner);return sync;
+    }
+    @Override public java.util.List<com.areonedev.autotrack.sync.SyncEngine.Operation> syncPending(String owner) throws Exception { return sync(owner).pending(owner); }
+    @Override public void syncAcknowledge(String owner,com.areonedev.autotrack.sync.SyncEngine.Operation op,String response) throws Exception { sync(owner).acknowledge(owner,op,response); }
+    @Override public void syncApply(String owner,String snapshot) throws Exception { sync(owner).apply(owner,snapshot); }
+    @Override public java.util.List<String> syncConflicts(String owner) throws Exception { return sync(owner).conflicts(owner); }
+    @Override public void syncResolve(String owner,String operationId,boolean keepLocal) throws Exception { sync(owner).resolve(owner,operationId,keepLocal); }
+    /** Internal download seam; never called by UI writes. */
+    public long syncSaveLocal(Lead lead,boolean insert) {
+        boolean previous=applyingRemote;applyingRemote=true;
+        try {
+            String error;
+            if(!insert && getLeadRandom(lead).isEmpty()) {
+                ContentValues restored=getLeadContentValues(lead);restored.put("LeadID",lead.getLeadID());restored.put("MappingFieldsKnown",1);
+                db.insertOrThrow(TABLE_LEADS,null,restored);error=null;
+            } else error=insert?insertLead(lead):updateLead(lead);
+            if(error!=null) throw new IllegalStateException("Unable to apply remote customer.");
+            db.execSQL("UPDATE Leads SET MappingFieldsKnown=1 WHERE LeadID=?",new Object[]{lead.getLeadID()});return lead.getLeadID();
+        } finally {applyingRemote=previous;}
+    }
+    public void syncDeleteLocal(long localId) {
+        db.delete("Tasks","LeadID=?",new String[]{Long.toString(localId)});
+        db.delete("Notifications","LeadID=?",new String[]{Long.toString(localId)});
+        db.delete("Leads","LeadID=?",new String[]{Long.toString(localId)});
     }
     @Override public LeadIdentity getLeadIdentity(long localId) { return identities().get(localId); }
     @Override public LeadIdentity findLeadIdentity(String syncId) { return identities().find(syncId); }
@@ -298,60 +332,49 @@ public class DataAccessObject implements DataAccess {
     }
 
 
-    @Override
-    public String insertLead(Lead lead) {
+    @Override public String insertLead(Lead lead) {
+        if(!isOpen()) return "Database connection lost";
+        long previous=lead.getLeadID();db.beginTransaction();boolean success=false;
         try {
-            ContentValues values = getLeadContentValues(lead);
-
-            // IMPORTANT: Remove LeadID from values so SQLite generates a new one
-            values.remove("LeadID");
-            values.put("MappingFieldsKnown", 1);
-
-            long rowId = db.insert(TABLE_LEADS, null, values);
-
-            if (rowId != -1) {
-                // SUCCESS: Now we assign the DB-generated ID back to the Lead object
-                lead.setLeadID((int) rowId);
-                return null;
-            } else {
-                return "Insert failed: rowId is -1";
+            ContentValues values=getLeadContentValues(lead);values.remove("LeadID");values.put("MappingFieldsKnown",1);
+            long rowId=db.insertOrThrow(TABLE_LEADS,null,values);lead.setLeadID(rowId);
+            if(sync!=null && !applyingRemote) sync.changed(rowId,false);
+            db.setTransactionSuccessful();success=true;return null;
+        } catch(Exception error) { return "Unable to save customer securely."; }
+        finally { db.endTransaction();if(!success) lead.setLeadID(previous);else requestSync(); }
+    }
+    @Override public String updateLead(Lead lead) {
+        if(!isOpen()) return "Database connection lost";
+        db.beginTransaction();
+        try {
+            int rows=db.update(TABLE_LEADS,getLeadContentValues(lead),"LeadID=?",new String[]{Long.toString(lead.getLeadID())});
+            if(rows!=1) return "Customer not found.";
+            if(sync!=null && !applyingRemote) sync.changed(lead.getLeadID(),false);
+            db.setTransactionSuccessful();return null;
+        } catch(Exception error) { return "Unable to save customer securely."; }
+        finally { db.endTransaction();requestSync(); }
+    }
+    @Override public String deleteLead(Lead lead) {
+        if(!isOpen()) return "Database connection lost";
+        db.beginTransaction();
+        try {
+            if(sync!=null && !applyingRemote) {
+                identities.get(lead.getLeadID());sync.changed(lead.getLeadID(),true);
             }
-        } catch (Exception e) {
-            return "SQL Error: " + e.getMessage();
-        }
+            int rows=db.delete(TABLE_LEADS,"LeadID=?",new String[]{Long.toString(lead.getLeadID())});
+            if(rows!=1) return "Customer not found.";
+            if(sync!=null) {
+                db.delete("Tasks","LeadID=?",new String[]{Long.toString(lead.getLeadID())});
+                db.delete("Notifications","LeadID=?",new String[]{Long.toString(lead.getLeadID())});
+            }
+            db.setTransactionSuccessful();return null;
+        } catch(Exception error) { return "Unable to delete customer."; }
+        finally { db.endTransaction();requestSync(); }
     }
 
-    @Override
-    public String updateLead(Lead lead) {
-        if (db == null) return "Database connection lost";
-        try {
-            ContentValues values = getLeadContentValues(lead);
-
-            // Log for debugging: verify what is being sent to the DB
-            Log.d(TAG, "Updating Lead ID: " + lead.getLeadID() +
-                    " with Vehicle: " + (lead.getLeadVehicleInterest() != null ?
-                    lead.getLeadVehicleInterest().getMake() : "NULL"));
-
-            int rows = db.update(TABLE_LEADS, values, "LeadID = ?",
-                    new String[]{String.valueOf(lead.getLeadID())});
-
-            return (rows > 0) ? null : "Update failed: Lead ID " + lead.getLeadID() + " not found";
-        } catch (Exception e) {
-            Log.e(TAG, "Update Error: " + e.getMessage());
-            return e.getMessage();
-        }
+    private void requestSync() {
+        if(sync!=null && !applyingRemote) com.areonedev.autotrack.sync.SyncRuntime.request(context);
     }
-
-    @Override
-    public String deleteLead(Lead lead) {
-        try {
-            int rows = db.delete(TABLE_LEADS, "LeadID = ?", new String[]{String.valueOf(lead.getLeadID())});
-            return (rows > 0) ? null : "Delete failed: Lead not found";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-    }
-
 
     /**
      * Helper to map Lead object to ContentValues for Insert/Update
