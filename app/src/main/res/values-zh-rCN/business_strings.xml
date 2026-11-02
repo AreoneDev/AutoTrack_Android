@@ -1,4 +1,6 @@
 <resources>
+    <string name="a11y_task_complete">标记任务为已完成：%1$s</string>
+    <string name="a11y_task_incomplete">标记任务为未完成：%1$s</string>
     <string name="leads_title">所有客户</string>
     <string name="lead_status">客户状态</string>
     <string name="sales_stage">销售阶段</string>
@@ -109,4 +111,13 @@
     <string name="mission_anniversary">🎂 周年：年度问候</string>
     <string name="mission_follow_up_plain">跟进</string>
     <string name="mission_summary">任务：%1$s [%2$s]</string>
+    <string name="a11y_no_results">没有结果</string>
+    <string name="a11y_add_task">添加任务</string>
+    <string name="a11y_show_filters">显示筛选条件</string>
+    <string name="a11y_hide_filters">隐藏筛选条件</string>
+    <string name="a11y_previous_week">上一周</string>
+    <string name="a11y_next_week">下一周</string>
+    <string name="a11y_call_lead">致电客户</string>
+    <string name="a11y_send_text">发送短信</string>
+    <string name="a11y_send_email">发送电子邮件</string>
 </resources>

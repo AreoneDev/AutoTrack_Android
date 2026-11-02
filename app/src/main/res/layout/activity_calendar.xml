@@ -39,8 +39,9 @@
 
             <ImageButton
                 android:id="@+id/btnPrevWeek"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/a11y_previous_week"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_previous"
                 app:tint="@android:color/darker_gray" />
@@ -55,8 +56,9 @@
 
             <ImageButton
                 android:id="@+id/btnNextWeek"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/a11y_next_week"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_next"
                 app:tint="@android:color/darker_gray" />

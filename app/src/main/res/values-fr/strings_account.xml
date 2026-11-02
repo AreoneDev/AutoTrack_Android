@@ -1,4 +1,5 @@
 <resources>
+    <string name="account_session_description">Vos clients et votre calendrier appartiennent à ce compte.</string>
     <string name="account_tab">Compte</string><string name="account_title">COMPTE</string>
     <string name="account_signed_in">Connecté</string><string name="account_id_label">Identifiant du compte</string>
     <string name="account_settings">Paramètres</string><string name="account_loading">Chargement du profil…</string>

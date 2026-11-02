@@ -15,6 +15,7 @@ public class IsolatedDatabase extends ExternalResource {
     public File file;
     private String previousPath;
     @Override protected void before() throws Throwable {
+        UiTestState.reset();
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Services.closeDataAccess();
         Services.initialize(context);
@@ -28,6 +29,7 @@ public class IsolatedDatabase extends ExternalResource {
         com.areonedev.autotrack.auth.SyntheticAccount.install(syntheticUser);
     }
     @Override protected void after() {
+        UiTestState.reset();
         Services.closeDataAccess();
         com.areonedev.autotrack.auth.SyntheticAccount.reset();
         Main.setDBPathName(previousPath);

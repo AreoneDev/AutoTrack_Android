@@ -1,4 +1,5 @@
 <resources>
+    <string name="account_session_description">您的客户和日历属于此账户。</string>
     <string name="account_tab">账户</string><string name="account_title">账户</string>
     <string name="account_signed_in">已登录</string><string name="account_id_label">账户 ID</string>
     <string name="account_settings">设置</string><string name="account_loading">正在加载资料…</string>

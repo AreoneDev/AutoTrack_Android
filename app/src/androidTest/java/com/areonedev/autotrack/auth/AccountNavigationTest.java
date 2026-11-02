@@ -110,13 +110,15 @@ public class AccountNavigationTest {
         try (ActivityScenario<AccountSettingsActivity> scenario = ActivityScenario.launch(AccountSettingsActivity.class)) {
             onView(withId(R.id.account_language)).perform(scrollTo(), click());
             onView(withText("简体中文")).perform(click());
+            com.areonedev.autotrack.testing.UiTestState.awaitResumed(AccountSettingsActivity.class, "zh", 0);
             onView(withId(R.id.account_language)).check(matches(withText("语言")));
             onView(withId(R.id.account_language)).perform(scrollTo(), click());
             onView(withText("Français")).perform(click());
+            com.areonedev.autotrack.testing.UiTestState.awaitResumed(AccountSettingsActivity.class, "fr", 0);
             onView(withId(R.id.account_language)).check(matches(withText("Langue")));
         } finally {
             InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
-                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.getEmptyLocaleList()));
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("en")));
         }
     }
     @Test public void editingProfileUpdatesDisplayedValues() {
@@ -178,6 +180,7 @@ public class AccountNavigationTest {
             onView(withText("private-access")).check(doesNotExist());
             onView(withText("private-refresh")).check(doesNotExist());
             onView(withId(R.id.auth_sign_out)).perform(scrollTo(), click());
+            com.areonedev.autotrack.testing.UiTestState.awaitResumed(com.areonedev.autotrack.presentation.LoginActivity.class, "en", 0);
             assertNull(Services.activeAccount());
             assertNull(accounts.current());
             assertFalse(AuthRuntime.hasAccount());
@@ -187,6 +190,7 @@ public class AccountNavigationTest {
                 assertEquals(0, signOuts[0]);
                 clearFails[0] = false;
                 onView(withId(R.id.auth_retry_logout)).perform(click());
+                com.areonedev.autotrack.testing.UiTestState.awaitResumed(com.areonedev.autotrack.presentation.LoginActivity.class, "en", 0);
             } else if (remoteFailure) {
                 onView(withId(R.id.auth_status)).check(matches(withText(R.string.auth_remote_logout_failed)));
             }

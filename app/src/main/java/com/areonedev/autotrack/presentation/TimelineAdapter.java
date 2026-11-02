@@ -91,6 +91,9 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
         }
         holder.tvTitle.setText(displayTitle);
         holder.tvDate.setText(dateTimeFormat.format(task.getDate()));
+        holder.ivCheck.setContentDescription(holder.itemView.getContext().getString(
+                task.isCompleted() ? R.string.a11y_task_incomplete : R.string.a11y_task_complete, displayTitle));
+        holder.ivCheck.setFocusable(true);
 
         // 2. Identify High-Intent Tasks (Appointments/Test Drives)
         String titleLower = task.getTitle().toLowerCase();
@@ -126,16 +129,16 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
 
             if (isHighIntent) {
                 // Highlight Appointments/Test Drives in Blue or Purple to show they are special
-                holder.tvTitle.setTextColor(Color.parseColor("#4CAF50"));
-                holder.tvDate.setTextColor(Color.parseColor("#4CAF50"));
+                holder.tvTitle.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorPrimary));
+                holder.tvDate.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorPrimary));
             } else if (task.getTitle().contains("URGENT")) {
                 holder.tvDate.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorError));
             } else {
-                holder.tvDate.setTextColor(Color.parseColor("#4CAF50")); // Green
+                holder.tvDate.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorPrimary)); // Green
             }
 
             holder.ivCheck.setImageResource(R.drawable.ic_radio_button_unchecked);
-            holder.ivCheck.setColorFilter(Color.parseColor("#4CAF50"));
+            holder.ivCheck.setColorFilter(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorPrimary));
         }
 
         // 4. CLICK LOGIC: Toggle completion and notify activity to recalculate score

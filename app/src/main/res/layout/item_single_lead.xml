@@ -41,7 +41,7 @@
             android:paddingVertical="4dp"
             android:text="NEW"
             android:textAllCaps="true"
-            android:textColor="#2196F3"
+            android:textColor="#0D47A1"
             android:textSize="11sp"
             android:textStyle="bold" />
 

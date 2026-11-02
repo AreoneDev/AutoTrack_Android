@@ -97,6 +97,7 @@ public class LeadsActivity extends AccountActivity {
         // 1. Toggle Filter Panel
         btnFilterToggle.setOnClickListener(v -> {
             isFilterPanelExpanded = !isFilterPanelExpanded;
+            btnFilterToggle.setContentDescription(getString(isFilterPanelExpanded ? R.string.a11y_hide_filters : R.string.a11y_show_filters));
             filterPanel.setVisibility(isFilterPanelExpanded ? View.VISIBLE : View.GONE);
             if (isFilterPanelExpanded) {
                 btnFilterToggle.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
@@ -110,6 +111,7 @@ public class LeadsActivity extends AccountActivity {
             applyFilters();
             filterPanel.setVisibility(View.GONE);
             isFilterPanelExpanded = false;
+            btnFilterToggle.setContentDescription(getString(R.string.a11y_show_filters));
             btnFilterToggle.setImageResource(R.drawable.ic_filter_funnel);
         });
 

@@ -1,4 +1,6 @@
 <resources>
+    <string name="a11y_task_complete">Marquer la tâche comme terminée : %1$s</string>
+    <string name="a11y_task_incomplete">Marquer la tâche comme non terminée : %1$s</string>
     <string name="leads_title">TOUS MES CLIENTS</string>
     <string name="lead_status">Statut du client</string>
     <string name="sales_stage">Étape de vente</string>
@@ -109,4 +111,13 @@
     <string name="mission_anniversary">🎂 Anniversaire : suivi annuel</string>
     <string name="mission_follow_up_plain">Suivi</string>
     <string name="mission_summary">Mission : %1$s [%2$s]</string>
+    <string name="a11y_no_results">Aucun résultat</string>
+    <string name="a11y_add_task">Ajouter une tâche</string>
+    <string name="a11y_show_filters">Afficher les filtres</string>
+    <string name="a11y_hide_filters">Masquer les filtres</string>
+    <string name="a11y_previous_week">Semaine précédente</string>
+    <string name="a11y_next_week">Semaine suivante</string>
+    <string name="a11y_call_lead">Appeler le client</string>
+    <string name="a11y_send_text">Envoyer un message texte</string>
+    <string name="a11y_send_email">Envoyer un courriel</string>
 </resources>

@@ -24,6 +24,13 @@ import static org.junit.Assert.*;
 public class TaskWorkflowTest {
     @Rule public IsolatedDatabase database = new IsolatedDatabase();
     private Lead lead;
+    @Test public void contactActionsHaveAccessibleLabels() {
+        try (ActivityScenario<LeadDetailsActivity> scenario = launch()) {
+            onView(withId(R.id.ivPhoneIcon)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Call lead")));
+            onView(withId(R.id.ivSmsIcon)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Send text message")));
+            onView(withId(R.id.ivEmailIcon)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Send email")));
+        }
+    }
     private ActivityScenario<LeadDetailsActivity> launch() {
         lead = new Lead("Synthetic", "Tasks", "4165550100", "test@example.invalid", "Sales", "", "", "ON", "Canada", "", 0, null, null, "");
         assertNull(database.dao.insertLead(lead));
@@ -52,8 +59,20 @@ public class TaskWorkflowTest {
             Task saved = tasks().get(0);
             assertEquals("Appointment: Synthetic task", saved.getTitle());
             assertFalse(saved.isCompleted());
+            onView(withId(R.id.ivTimelineStatus)).perform(scrollTo()).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Mark task complete: Appointment: Synthetic task")));
+            onView(withId(R.id.ivTimelineStatus)).check((view, error) -> {
+                if (error != null) throw error;
+                float density = view.getResources().getDisplayMetrics().density;
+                assertTrue("Task completion target must be at least 48dp", view.getWidth() / density >= 48 && view.getHeight() / density >= 48);
+            });
+            onView(withId(R.id.tvTimelineDate)).check((view, error) -> {
+                if (error != null) throw error;
+                int background = com.google.android.material.color.MaterialColors.getColor(view, com.google.android.material.R.attr.colorSurface);
+                assertTrue("Task date text must meet 4.5:1 contrast", androidx.core.graphics.ColorUtils.calculateContrast(((android.widget.TextView)view).getCurrentTextColor(), background) >= 4.5);
+            });
             onView(withId(R.id.ivTimelineStatus)).perform(scrollTo(), click());
             assertTrue(tasks().get(0).isCompleted());
+            onView(withId(R.id.ivTimelineStatus)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Mark task incomplete: Appointment: Synthetic task")));
             scenario.recreate();
             assertTrue(tasks().get(0).isCompleted());
             onView(withId(R.id.ivTimelineStatus)).perform(scrollTo(), click());

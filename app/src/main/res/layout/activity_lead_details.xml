@@ -15,8 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AutoTrack.PrimaryToolbar"
             app:title="Lead Details"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="?attr/colorOnPrimary" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Main Content Area -->
@@ -126,6 +127,7 @@
 
                             <ImageView
                                 android:id="@+id/ivPhoneIcon"
+                                android:contentDescription="@string/a11y_call_lead"
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 android:layout_gravity="center"
@@ -142,6 +144,7 @@
 
                             <ImageView
                                 android:id="@+id/ivSmsIcon"
+                                android:contentDescription="@string/a11y_send_text"
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 android:layout_gravity="center"
@@ -158,6 +161,7 @@
 
                             <ImageView
                                 android:id="@+id/ivEmailIcon"
+                                android:contentDescription="@string/a11y_send_email"
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
                                 android:layout_gravity="center"
@@ -270,7 +274,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Add new task"
+                            android:contentDescription="@string/a11y_add_task"
                             android:src="@android:drawable/ic_input_add"
                             app:tint="?attr/colorPrimary" />
                     </RelativeLayout>

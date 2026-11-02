@@ -1,4 +1,6 @@
 <resources>
+    <string name="a11y_task_complete">Mark task complete: %1$s</string>
+    <string name="a11y_task_incomplete">Mark task incomplete: %1$s</string>
     <string name="leads_title">ALL MY LEADS</string>
     <string name="lead_status">Lead Status</string>
     <string name="sales_stage">Sales Stage</string>
@@ -109,4 +111,13 @@
     <string name="mission_anniversary">🎂 Anniversary: Yearly check-in</string>
     <string name="mission_follow_up_plain">Follow up</string>
     <string name="mission_summary">Mission: %1$s [%2$s]</string>
+    <string name="a11y_no_results">No results</string>
+    <string name="a11y_add_task">Add new task</string>
+    <string name="a11y_show_filters">Show filters</string>
+    <string name="a11y_hide_filters">Hide filters</string>
+    <string name="a11y_previous_week">Previous week</string>
+    <string name="a11y_next_week">Next week</string>
+    <string name="a11y_call_lead">Call lead</string>
+    <string name="a11y_send_text">Send text message</string>
+    <string name="a11y_send_email">Send email</string>
 </resources>

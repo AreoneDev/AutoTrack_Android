@@ -79,6 +79,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/a11y_show_filters"
                     android:src="@drawable/ic_filter_funnel"
                     app:tint="#2196F3" />
             </RelativeLayout>
@@ -253,7 +254,7 @@
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:contentDescription="No results"
+            android:contentDescription="@string/a11y_no_results"
             android:src="@android:drawable/ic_menu_search"
             app:tint="#BDBDBD" />
 
@@ -282,7 +283,7 @@
         android:layout_above="@id/bottom_navigation"
         android:layout_alignParentEnd="true"
         android:layout_margin="20dp"
-        android:contentDescription="Add Lead"
+        android:contentDescription="@string/add_lead"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="#2196F3"
         app:elevation="6dp"
