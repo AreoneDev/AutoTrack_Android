@@ -79,5 +79,3 @@ test('real baseline, ownership, privilege correction and sync compose with isola
     await assert.rejects(() => db.exec('SELECT * FROM public.leads'), /permission denied/);
   } finally { await db.close(); }
 });
-
-

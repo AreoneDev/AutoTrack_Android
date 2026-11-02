@@ -49,5 +49,3 @@ test('CLI generates local files and refuses to overwrite an existing directory',
     assert.equal(await readFile(join(output, 'bootstrap.sql'), 'utf8'), original);
   } finally { await rm(parent, {recursive:true,force:true}); }
 });
-
-

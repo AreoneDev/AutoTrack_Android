@@ -93,4 +93,3 @@ The existing Web scalar UPDATE is unversioned: it can overwrite a newer Android 
 Leave cloud rows and evidence in the dedicated test project for review. Cleanup or project deletion is a separate explicit action; this package does not automate it. Do not add CI/CD or connect the new project to GitHub automatically.
 
 References: [Supabase environments](https://supabase.com/docs/guides/deployment/managing-environments), [API keys](https://supabase.com/docs/guides/getting-started/api-keys), [Android sync protocol](../ANDROID_SYNC.md).
-
