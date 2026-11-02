@@ -1,0 +1,24 @@
+<resources>
+    <string name="auth_title">登录 AutoTrack</string>
+    <string name="auth_email">邮箱</string>
+    <string name="auth_continue">继续</string>
+    <string name="auth_password">密码</string>
+    <string name="auth_sign_in">登录</string>
+    <string name="auth_register">注册</string>
+    <string name="auth_create_account">创建账户</string>
+    <string name="auth_back_to_login">返回登录</string>
+    <string name="auth_registration_hint">输入邮箱和密码以创建账户。</string>
+    <string name="auth_registration_failed">无法创建账户，请检查信息或尝试登录。</string>
+    <string name="auth_confirmation_required">如果账户可以创建，请查看邮箱中的确认链接。</string>
+    <string name="auth_retry_logout">重试退出登录</string>
+    <string name="auth_logout_pending">账户已锁定，但无法清除此设备上的会话。关闭应用前请重试退出。</string>
+    <string name="auth_remote_logout_failed">此设备上的会话已清除，但服务器未确认退出。</string>
+    <string name="auth_checking">正在检查会话…</string>
+    <string name="auth_password_hint">使用现有 AutoTrack 邮箱和密码。</string>
+    <string name="auth_credentials_required">请输入邮箱和密码。</string>
+    <string name="auth_credentials_rejected">登录失败，请检查凭据和邮箱验证状态。</string>
+    <string name="auth_login_failed">无法安全登录，请重试。</string>
+    <string name="auth_restore_failed">无法恢复会话，请检查网络或重新登录。</string>
+    <string name="auth_storage_failed">无法打开账户数据，请重试。</string>
+    <string name="auth_configuration_missing">此版本无法登录。</string>
+</resources>

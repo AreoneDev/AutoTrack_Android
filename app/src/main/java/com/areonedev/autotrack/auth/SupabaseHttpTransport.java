@@ -18,16 +18,26 @@ public final class SupabaseHttpTransport implements SupabaseAuthProvider.Transpo
         this.baseUrl = baseUrl; this.publicKey = publicKey;
     }
     public SupabaseAuthProvider.Response post(String path, String bearer, Map<String, String> body) throws IOException {
+        return request("POST", path, bearer, body);
+    }
+    public SupabaseAuthProvider.Response get(String path, String bearer) throws IOException {
+        return request("GET", path, bearer, Collections.emptyMap());
+    }
+    public SupabaseAuthProvider.Response put(String path, String bearer, Map<String, String> body) throws IOException {
+        return request("PUT", path, bearer, body);
+    }
+    private SupabaseAuthProvider.Response request(String method, String path, String bearer, Map<String, String> body) throws IOException {
         HttpsURLConnection connection = (HttpsURLConnection) new URL(baseUrl + "/auth/v1" + path).openConnection();
         try {
             connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod(method);
             connection.setConnectTimeout(15000); connection.setReadTimeout(15000);
             connection.setRequestProperty("apikey", publicKey);
             if (bearer != null) connection.setRequestProperty("Authorization", "Bearer " + bearer);
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-            try (OutputStream out = connection.getOutputStream()) {
+            if (!method.equals("GET")) {
+              connection.setDoOutput(true);
+              try (OutputStream out = connection.getOutputStream()) {
                 Map<String, String> fields = new HashMap<>(body);
                 JSONObject metadata = new JSONObject();
                 for (String field : new String[]{"first_name", "last_name", "phone"}) {
@@ -37,6 +47,7 @@ public final class SupabaseHttpTransport implements SupabaseAuthProvider.Transpo
                 JSONObject payload = new JSONObject(fields);
                 if (metadata.length() > 0) payload.put("data", metadata);
                 out.write(payload.toString().getBytes(StandardCharsets.UTF_8));
+              }
             }
             int status = connection.getResponseCode();
             if (status < 200 || status >= 300 || status == 204)
@@ -54,6 +65,14 @@ public final class SupabaseHttpTransport implements SupabaseAuthProvider.Transpo
             for (String field : new String[]{"access_token", "refresh_token", "expires_at", "expires_in"})
                 if (json.has(field)) result.put(field, json.get(field));
             if (json.has("user")) result.put("user", Collections.singletonMap("id", json.getJSONObject("user").getString("id")));
+            if (path.equals("/user")) {
+                result.put("id", json.getString("id"));
+                result.put("email", json.optString("email", ""));
+                JSONObject metadata = json.optJSONObject("user_metadata");
+                Map<String, String> fields = new HashMap<>();
+                if (metadata != null) for (String field : new String[]{"first_name", "last_name", "phone"}) fields.put(field, metadata.optString(field, ""));
+                result.put("user_metadata", fields);
+            }
             return new SupabaseAuthProvider.Response(status, result);
         } catch (org.json.JSONException invalid) { throw new IOException("Invalid sign-in response."); }
         finally { connection.disconnect(); }

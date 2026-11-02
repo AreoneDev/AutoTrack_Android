@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:text="Mon"
         android:textSize="11sp"
-        android:textColor="#777777" />
+        android:textColor="?attr/colorOnSurfaceVariant" />
 
     <TextView
         android:id="@+id/tvDayNumber"
@@ -24,5 +24,5 @@
         android:text="28"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black" />
+        android:textColor="?attr/colorOnSurface" />
 </LinearLayout>

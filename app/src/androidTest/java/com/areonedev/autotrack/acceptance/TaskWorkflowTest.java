@@ -24,6 +24,13 @@ import static org.junit.Assert.*;
 public class TaskWorkflowTest {
     @Rule public IsolatedDatabase database = new IsolatedDatabase();
     private Lead lead;
+    @Test public void contactActionsHaveAccessibleLabels() {
+        try (ActivityScenario<LeadDetailsActivity> scenario = launch()) {
+            onView(withId(R.id.ivPhoneIcon)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Call lead")));
+            onView(withId(R.id.ivSmsIcon)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Send text message")));
+            onView(withId(R.id.ivEmailIcon)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Send email")));
+        }
+    }
     private ActivityScenario<LeadDetailsActivity> launch() {
         lead = new Lead("Synthetic", "Tasks", "4165550100", "test@example.invalid", "Sales", "", "", "ON", "Canada", "", 0, null, null, "");
         assertNull(database.dao.insertLead(lead));
@@ -44,7 +51,7 @@ public class TaskWorkflowTest {
     @Test public void createCompleteReopenEditAndDeleteTask() {
         try (ActivityScenario<LeadDetailsActivity> scenario = launch()) {
             assertTrue(tasks().isEmpty());
-            onView(withId(R.id.btnAddTask)).perform(click());
+            onView(withId(R.id.btnAddTask)).perform(scrollTo(), click());
             chooseTaskTypeAndDefaultDateTime("Appointment");
             dialogText("Synthetic task");
             onView(withText("Confirm & Save")).inRoot(isDialog()).perform(click());
@@ -52,20 +59,32 @@ public class TaskWorkflowTest {
             Task saved = tasks().get(0);
             assertEquals("Appointment: Synthetic task", saved.getTitle());
             assertFalse(saved.isCompleted());
-            onView(withId(R.id.ivTimelineStatus)).perform(click());
+            onView(withId(R.id.ivTimelineStatus)).perform(scrollTo()).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Mark task complete: Appointment: Synthetic task")));
+            onView(withId(R.id.ivTimelineStatus)).check((view, error) -> {
+                if (error != null) throw error;
+                float density = view.getResources().getDisplayMetrics().density;
+                assertTrue("Task completion target must be at least 48dp", view.getWidth() / density >= 48 && view.getHeight() / density >= 48);
+            });
+            onView(withId(R.id.tvTimelineDate)).check((view, error) -> {
+                if (error != null) throw error;
+                int background = com.google.android.material.color.MaterialColors.getColor(view, com.google.android.material.R.attr.colorSurface);
+                assertTrue("Task date text must meet 4.5:1 contrast", androidx.core.graphics.ColorUtils.calculateContrast(((android.widget.TextView)view).getCurrentTextColor(), background) >= 4.5);
+            });
+            onView(withId(R.id.ivTimelineStatus)).perform(scrollTo(), click());
             assertTrue(tasks().get(0).isCompleted());
+            onView(withId(R.id.ivTimelineStatus)).check(androidx.test.espresso.assertion.ViewAssertions.matches(withContentDescription("Mark task incomplete: Appointment: Synthetic task")));
             scenario.recreate();
             assertTrue(tasks().get(0).isCompleted());
-            onView(withId(R.id.ivTimelineStatus)).perform(click());
+            onView(withId(R.id.ivTimelineStatus)).perform(scrollTo(), click());
             assertFalse(tasks().get(0).isCompleted());
-            onView(withText(containsString("Synthetic task"))).perform(click());
+            onView(withText(containsString("Synthetic task"))).perform(scrollTo(), click());
             onView(withText("Edit Task")).inRoot(isDialog()).perform(click());
             chooseTaskTypeAndDefaultDateTime("Follow-up");
             dialogText("Synthetic edited");
             onView(withText("Save Changes")).inRoot(isDialog()).perform(click());
             assertEquals(saved.getEventID(), tasks().get(0).getEventID());
             assertEquals("Follow-up: Synthetic edited", tasks().get(0).getTitle());
-            onView(withText(containsString("Synthetic edited"))).perform(click());
+            onView(withText(containsString("Synthetic edited"))).perform(scrollTo(), click());
             onView(withText("Delete Task")).inRoot(isDialog()).perform(click());
             onView(withText("Delete")).inRoot(isDialog()).perform(click());
             assertTrue(tasks().isEmpty());
@@ -74,7 +93,7 @@ public class TaskWorkflowTest {
     @Test public void cancelTaskDetailsDoesNotPersist() {
         try (ActivityScenario<LeadDetailsActivity> scenario = launch()) {
             int before = tasks().size();
-            onView(withId(R.id.btnAddTask)).perform(click());
+            onView(withId(R.id.btnAddTask)).perform(scrollTo(), click());
             chooseTaskTypeAndDefaultDateTime("Other");
             dialogText("Cancelled synthetic task");
             onView(withText("Cancel")).inRoot(isDialog()).perform(click());

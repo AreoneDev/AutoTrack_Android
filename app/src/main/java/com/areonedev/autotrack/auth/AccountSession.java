@@ -11,6 +11,8 @@ public final class AccountSession {
         default Session signUp(String email, String password, String first, String last, String phone) throws Exception { return signUp(email, password); }
         Session refresh(String refreshToken) throws Exception;
         void signOut(String accessToken) throws Exception;
+        default Profile profile(String accessToken) throws Exception { throw new UnsupportedOperationException(); }
+        default Profile updateProfile(String accessToken, String first, String last, String phone) throws Exception { throw new UnsupportedOperationException(); }
     }
     public interface Store {
         Session load() throws Exception;
@@ -36,6 +38,13 @@ public final class AccountSession {
             this.expiresAt = expiresAt;
         }
     }
+    public static final class Profile {
+        public final String userId, firstName, lastName, phone, email;
+        public Profile(String userId, String firstName, String lastName, String phone, String email) {
+            databaseName(userId);
+            this.userId = userId; this.firstName = firstName; this.lastName = lastName; this.phone = phone; this.email = email;
+        }
+    }
     private final Provider provider;
     private final Store store;
     private final LongSupplier clock;
@@ -51,6 +60,27 @@ public final class AccountSession {
     public synchronized Session current() { return current; }
     public synchronized boolean isLogoutPending() { return logoutPending; }
     public synchronized long generation() { return generation; }
+    public Profile profile() throws Exception {
+        Session session; long ticket;
+        synchronized (this) { session = current; ticket = generation; }
+        if (session == null || session.expiresAt <= clock.getAsLong()) throw new RejectedSessionException();
+        Profile result = provider.profile(session.accessToken);
+        synchronized (this) {
+            if (!isCurrent(session.userId, ticket) || !session.userId.equals(result.userId)) throw new RejectedSessionException();
+        }
+        return result;
+    }
+    public Profile updateProfile(String first, String last, String phone) throws Exception {
+        if (first.trim().isEmpty() || last.trim().isEmpty() || phone.trim().isEmpty()) throw new IllegalArgumentException();
+        Session session; long ticket;
+        synchronized (this) { session = current; ticket = generation; }
+        if (session == null || session.expiresAt <= clock.getAsLong()) throw new RejectedSessionException();
+        Profile result = provider.updateProfile(session.accessToken, first, last, phone);
+        synchronized (this) {
+            if (!isCurrent(session.userId, ticket) || !session.userId.equals(result.userId)) throw new RejectedSessionException();
+        }
+        return result;
+    }
     public synchronized boolean isCurrent(String user, long ticket) {
         return current != null && current.userId.equals(user) && ticket == generation;
     }

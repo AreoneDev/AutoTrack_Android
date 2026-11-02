@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="?attr/colorSurface"
         android:elevation="4dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Calendar"
-            app:titleTextColor="@android:color/black" />
+            app:title="@string/nav_calendar"
+            app:titleTextColor="?attr/colorOnSurface" />
 
         <!-- 1. Month/Year stays alone at the top -->
         <TextView
@@ -26,7 +26,7 @@
             android:gravity="center"
             android:padding="8dp"
             android:text="March 2026"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -39,8 +39,9 @@
 
             <ImageButton
                 android:id="@+id/btnPrevWeek"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/a11y_previous_week"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_previous"
                 app:tint="@android:color/darker_gray" />
@@ -55,8 +56,9 @@
 
             <ImageButton
                 android:id="@+id/btnNextWeek"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/a11y_next_week"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_next"
                 app:tint="@android:color/darker_gray" />
@@ -81,8 +83,8 @@
                 android:id="@+id/tvAgendaHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Daily Agenda"
-                android:textColor="@android:color/black"
+                android:text="@string/daily_agenda"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -128,7 +130,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="No Tasks Scheduled Today"
+                            android:text="@string/no_tasks"
                             android:textColor="@android:color/darker_gray"
                             android:textSize="16sp"
                             android:textStyle="italic" />
@@ -144,7 +146,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@android:color/white"
+        android:background="?attr/colorSurface"
         app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

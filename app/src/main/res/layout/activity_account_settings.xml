@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="?attr/colorSurface">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="20dp" android:background="?attr/colorSurface"
+        android:text="@string/account_title" android:textColor="#2196F3"
+        android:textSize="28sp" android:textStyle="bold" android:accessibilityHeading="true" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurface" app:cardCornerRadius="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="20dp">
+                    <ImageView android:layout_width="48dp" android:layout_height="48dp"
+                        android:src="@drawable/ic_account" app:tint="?attr/colorPrimary"
+                        android:importantForAccessibility="no" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:text="@string/account_signed_in"
+                        android:textSize="22sp" android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp" android:text="@string/account_id_label" android:textColor="?attr/colorOnSurfaceVariant" />
+                    <TextView android:id="@+id/account_identity" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                        android:textSize="16sp" android:textColor="?attr/colorOnSurface" android:textIsSelectable="true" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:id="@+id/account_profile" android:layout_marginTop="12dp" android:text="@string/account_loading" android:textColor="?attr/colorOnSurfaceVariant" />
+                    <Button android:id="@+id/account_edit" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:enabled="false"
+                        android:text="@string/account_edit" />
+                    <Button android:id="@+id/account_retry" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone"
+                        android:text="@string/account_retry" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" android:layout_marginBottom="8dp"
+                android:text="@string/account_settings" android:textSize="18sp" android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" android:accessibilityHeading="true" />
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurface" app:cardCornerRadius="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="16dp">
+                    <Button android:id="@+id/account_appearance" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="start|center_vertical" android:text="@string/account_appearance" />
+                    <Button android:id="@+id/account_language" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="start|center_vertical" android:text="@string/account_language" />
+                    <Button android:id="@id/sync_review" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical" android:text="@string/sync_review" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="@string/account_sync_description" android:textColor="?attr/colorOnSurfaceVariant" />
+                    <Button android:id="@+id/account_notifications" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:gravity="start|center_vertical"
+                        android:text="@string/account_notifications" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="@string/account_notifications_description" android:textColor="?attr/colorOnSurfaceVariant" />
+                    <Button android:id="@+id/account_support" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="start|center_vertical" android:text="@string/account_support" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <Button android:id="@id/auth_sign_out" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" android:text="@string/auth_sign_out" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:text="@string/account_sign_out_description"
+                android:textColor="?attr/colorOnSurfaceVariant" android:textSize="12sp" />
+        </LinearLayout>
+    </ScrollView>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="?attr/colorSurface" app:labelVisibilityMode="labeled" app:menu="@menu/bottom_nav_menu" />
+</LinearLayout>

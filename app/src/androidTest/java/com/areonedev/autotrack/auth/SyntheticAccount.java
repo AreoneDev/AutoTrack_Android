@@ -13,6 +13,8 @@ public final class SyntheticAccount {
             public AccountSession.Session signIn(String email, String password) { throw new AssertionError("Unexpected network operation."); }
             public AccountSession.Session refresh(String token) { throw new AssertionError("Unexpected network operation."); }
             public void signOut(String token) { }
+            public AccountSession.Profile profile(String token) { return new AccountSession.Profile(userId, "Ada", "Example", "5550100", "ada@example.invalid"); }
+            public AccountSession.Profile updateProfile(String token, String first, String last, String phone) { return new AccountSession.Profile(userId, first, last, phone, "ada@example.invalid"); }
         }, store, () -> 1000L);
         accounts.restore();
         AuthRuntime.useForTests(accounts, Runnable::run);

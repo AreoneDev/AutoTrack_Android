@@ -33,7 +33,7 @@ public class LeadsCreationActivity extends AccountActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("Add New Lead");
+            getSupportActionBar().setTitle(R.string.add_lead);
         }
 
         accessLeads = new AccessLeads();
@@ -70,7 +70,7 @@ public class LeadsCreationActivity extends AccountActivity {
 
         // Basic Validation
         if (first.isEmpty() || last.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "Name and Phone are required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.name_phone_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -80,7 +80,7 @@ public class LeadsCreationActivity extends AccountActivity {
 
         if (existingLead != null) {
             // Case 2: Duplicate found
-            Toast.makeText(this, "Error: A lead with this phone number already exists!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.duplicate_phone, Toast.LENGTH_LONG).show();
         } else {
             // Case 1: Positive case - Create new lead
             saveNewLead(first, last, phone, email);
@@ -137,10 +137,10 @@ public class LeadsCreationActivity extends AccountActivity {
         String result = accessLeads.insertLead(newLead);
 
         if (result == null) {
-            Toast.makeText(this, "Lead created successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.lead_created, Toast.LENGTH_SHORT).show();
             finish(); // Return to LeadsActivity
         } else {
-            Toast.makeText(this, "Database Error: " + result, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.database_error, result), Toast.LENGTH_SHORT).show();
         }
     }
 }

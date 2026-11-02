@@ -48,7 +48,16 @@ public class WeekAdapter extends RecyclerView.Adapter<WeekAdapter.ViewHolder> {
         SimpleDateFormat dayNumFormat = new SimpleDateFormat("d", Locale.getDefault());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
 
-        holder.tvDayName.setText(dayNameFormat.format(date));
+        String dayName = dayNameFormat.format(date);
+        holder.tvDayName.setContentDescription(dayName);
+        android.content.res.Configuration configuration = holder.itemView.getResources().getConfiguration();
+        if ((configuration.screenWidthDp < 360 || configuration.fontScale >= 1.3f) && !dayName.isEmpty()) {
+            int count = dayName.codePointCount(0, dayName.length());
+            int index = Locale.getDefault().getLanguage().equals("zh") ? count - 1 : 0;
+            int start = dayName.offsetByCodePoints(0, index);
+            dayName = dayName.substring(start, dayName.offsetByCodePoints(start, 1));
+        }
+        holder.tvDayName.setText(dayName);
         holder.tvDayNumber.setText(dayNumFormat.format(date));
 
         // 1. Get strings for comparison
@@ -62,18 +71,19 @@ public class WeekAdapter extends RecyclerView.Adapter<WeekAdapter.ViewHolder> {
         if (dateStr.equals(selectedStr)) {
             // HIGHLIGHT: User's current selection (Blue Circle)
             holder.tvDayNumber.setBackgroundResource(R.drawable.circle_background_light_blue);
-            holder.tvDayNumber.setTextColor(Color.WHITE);
-            holder.tvDayName.setTextColor(Color.BLACK); // Keep name readable
+            holder.tvDayNumber.setBackgroundTintList(android.content.res.ColorStateList.valueOf(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorPrimary)));
+            holder.tvDayNumber.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnPrimary));
+            holder.tvDayName.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurface));
         } else if (dateStr.equals(todayStr)) {
             // HIGHLIGHT: Today's date (Red text)
             holder.tvDayNumber.setBackground(null);
-            holder.tvDayNumber.setTextColor(Color.RED);
-            holder.tvDayName.setTextColor(Color.RED);
+            holder.tvDayNumber.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorError));
+            holder.tvDayName.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorError));
         } else {
             // DEFAULT: Normal day
             holder.tvDayNumber.setBackground(null);
-            holder.tvDayNumber.setTextColor(Color.BLACK);
-            holder.tvDayName.setTextColor(Color.GRAY);
+            holder.tvDayNumber.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurface));
+            holder.tvDayName.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurfaceVariant));
         }
 
         holder.itemView.setOnClickListener(v -> listener.onDateClick(date));

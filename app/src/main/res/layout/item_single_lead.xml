@@ -21,10 +21,11 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@id/text_lead_stage"
+            android:layout_marginEnd="8dp"
             android:ellipsize="end"
-            android:maxLines="1"
+            android:maxLines="2"
             android:text="Lead Name"
-            android:textColor="#212121"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -40,7 +41,7 @@
             android:paddingVertical="4dp"
             android:text="NEW"
             android:textAllCaps="true"
-            android:textColor="#2196F3"
+            android:textColor="#0D47A1"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -52,7 +53,7 @@
             android:layout_below="@id/text_lead_name"
             android:layout_marginTop="2dp"
             android:text="613-000-0000"
-            android:textColor="#757575"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="14sp" />
 
         <!-- 4. Vehicle Interest (3-Row Display) -->
@@ -65,7 +66,7 @@
             android:layout_marginTop="12dp"
             android:lineSpacingExtra="2dp"
             android:text="2024 Volkswagen\nAtlas\nExecline"
-            android:textColor="#424242"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="14sp" />
 
     </RelativeLayout>

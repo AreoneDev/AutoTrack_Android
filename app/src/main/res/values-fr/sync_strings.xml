@@ -1,0 +1,11 @@
+<resources>
+    <string name="sync_now">Synchroniser et actualiser</string><string name="sync_conflict">Examiner le conflit client</string>
+    <string name="sync_choose">Les deux appareils ont modifié ce client. Conserver la copie locale ou accepter celle du serveur ? Les modifications locales en attente seront perdues si vous acceptez la copie du serveur. Un client supprimé sur le serveur ne peut pas être restauré en conservant la copie locale.</string>
+    <string name="sync_keep_local">Conserver la copie locale</string><string name="sync_keep_remote">Accepter la copie du serveur</string>
+    <string name="sync_unavailable">Synchronisation indisponible. Vos modifications en attente sont conservées.</string>
+    <string name="sync_resolution_failed">Impossible de résoudre ce conflit. Si le client a été supprimé sur le serveur, acceptez la suppression ou créez un nouveau client.</string>
+    <string name="sync_customer_conflict">Examiner le conflit : %1$s</string><string name="sync_deleted">Supprimé</string>
+    <string name="sync_compare_notes">Notes locales : %1$s\nNotes du serveur : %2$s</string>
+    <string name="sync_status_idle">Pas encore synchronisé</string><string name="sync_status_running">Synchronisation en cours</string>
+    <string name="sync_status_complete">Synchronisation terminée ; vérifiez les conflits</string><string name="sync_status_offline">Hors ligne ou synchronisation indisponible ; les modifications restent sur cet appareil</string>
+</resources>

@@ -8,6 +8,8 @@ import java.util.function.LongSupplier;
 public final class SupabaseAuthProvider implements AccountSession.Provider {
     public interface Transport {
         Response post(String path, String bearer, Map<String, String> body) throws IOException;
+        default Response get(String path, String bearer) throws IOException { throw new UnsupportedOperationException(); }
+        default Response put(String path, String bearer, Map<String, String> body) throws IOException { throw new UnsupportedOperationException(); }
     }
     public static final class Response {
         public final int status;
@@ -43,6 +45,20 @@ public final class SupabaseAuthProvider implements AccountSession.Provider {
     public void signOut(String token) throws Exception {
         check(transport.post("/logout?scope=local", token, Collections.emptyMap()));
     }
+    public AccountSession.Profile profile(String token) throws Exception { return profileResponse(transport.get("/user", token)); }
+    public AccountSession.Profile updateProfile(String token, String first, String last, String phone) throws Exception {
+        Map<String, String> fields = new HashMap<>();
+        fields.put("data.first_name", first.trim()); fields.put("data.last_name", last.trim()); fields.put("data.phone", phone.trim());
+        return profileResponse(transport.put("/user", token, fields));
+    }
+    private AccountSession.Profile profileResponse(Response response) throws Exception {
+        check(response);
+        try {
+            Map<?, ?> metadata = response.body.get("user_metadata") instanceof Map ? (Map<?, ?>) response.body.get("user_metadata") : Collections.emptyMap();
+            return new AccountSession.Profile((String) response.body.get("id"), value(metadata, "first_name"), value(metadata, "last_name"), value(metadata, "phone"), value(response.body, "email"));
+        } catch (RuntimeException malformed) { throw new IOException("Invalid account response."); }
+    }
+    private static String value(Map<?, ?> map, String key) { Object value = map.get(key); return value instanceof String ? (String) value : ""; }
     private static void check(Response response) throws Exception {
         if (response.status >= 200 && response.status < 300) return;
         if (response.status == 400 || response.status == 401 || response.status == 403 || response.status == 422)

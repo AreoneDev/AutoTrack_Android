@@ -1,0 +1,7 @@
+<resources>
+    <style name="ThemeOverlay.AutoTrack.PrimaryToolbar" parent="">
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
+        <item name="android:textColorSecondary">?attr/colorOnPrimary</item>
+    </style>
+</resources>

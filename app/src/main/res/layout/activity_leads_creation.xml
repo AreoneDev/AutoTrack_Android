@@ -10,9 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AutoTrack.PrimaryToolbar"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Create New Lead"
-        app:titleTextColor="@android:color/white" />
+        app:titleTextColor="?attr/colorOnPrimary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,7 +32,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contact Information"
+                android:text="@string/contact_info"
                 android:textColor="?attr/colorPrimary"
                 android:textStyle="bold" />
 
@@ -39,28 +40,28 @@
                 android:id="@+id/etFirstName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="First Name *"
+                android:hint="@string/first_required"
                 android:inputType="textPersonName" />
 
             <EditText
                 android:id="@+id/etLastName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Last Name *"
+                android:hint="@string/last_required"
                 android:inputType="textPersonName" />
 
             <EditText
                 android:id="@+id/etPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone Number *"
+                android:hint="@string/phone_required"
                 android:inputType="phone" />
 
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email Address"
+                android:hint="@string/email_address"
                 android:inputType="textEmailAddress" />
 
             <!-- Vehicle Interest Section -->
@@ -68,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Vehicle Interest"
+                android:text="@string/vehicle_interest"
                 android:textColor="?attr/colorPrimary"
                 android:textStyle="bold" />
 
@@ -76,28 +77,28 @@
                 android:id="@+id/etMake"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Vehicle Make (e.g. Volkswagen)"
+                android:hint="@string/vehicle_make"
                 android:inputType="text" />
 
             <EditText
                 android:id="@+id/etModel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Vehicle Model (e.g. Tiguan)"
+                android:hint="@string/vehicle_model"
                 android:inputType="text" />
 
             <EditText
                 android:id="@+id/etYear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Vehicle Year (e.g. 2026)"
+                android:hint="@string/vehicle_year"
                 android:inputType="number" />
 
             <EditText
                 android:id="@+id/etTrim"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Vehicle Trim (e.g. Highline R-Line)"
+                android:hint="@string/vehicle_trim"
                 android:inputType="text" />
 
             <!-- Additional Notes -->
@@ -107,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:gravity="top"
-                android:hint="Additional Notes"
+                android:hint="@string/additional_notes"
                 android:inputType="textMultiLine"
                 android:lines="3" />
 
@@ -119,7 +120,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Save Lead"
+        android:text="@string/save_lead"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

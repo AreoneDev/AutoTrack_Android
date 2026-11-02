@@ -1,0 +1,22 @@
+<resources>
+    <string-array name="task_type_labels"><item>预约</item><item>试驾</item><item>跟进</item><item>其他</item></string-array>
+    <string-array name="task_action_labels"><item>编辑任务</item><item>删除任务</item><item>取消</item></string-array>
+    <string-array name="filter_status">
+        <item>所有状态</item>
+        <item>进行中</item>
+        <item>已流失</item>
+    </string-array>
+    <string-array name="filter_stages">
+        <item>所有阶段</item>
+        <item>新客户</item>
+        <item>已联系</item>
+        <item>已到访</item>
+        <item>试驾</item>
+        <item>谈判</item>
+    </string-array>
+    <string-array name="filter_division">
+        <item>所有部门</item>
+        <item>新车</item>
+        <item>二手车</item>
+    </string-array>
+</resources>

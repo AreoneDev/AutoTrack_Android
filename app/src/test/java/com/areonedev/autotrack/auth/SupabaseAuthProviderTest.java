@@ -5,6 +5,32 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class SupabaseAuthProviderTest {
+    @Test public void profileUsesAuthenticatedUserAndOnlyUpdatesEditableMetadata() throws Exception {
+        List<String> methods = new ArrayList<>();
+        SupabaseAuthProvider.Transport transport = new SupabaseAuthProvider.Transport() {
+            public SupabaseAuthProvider.Response post(String path, String token, Map<String, String> body) { throw new AssertionError(); }
+            public SupabaseAuthProvider.Response get(String path, String token) {
+                methods.add("GET " + path); assertEquals("synthetic-access", token);
+                Map<String,Object> user = new HashMap<>();
+                user.put("id", "00000000-0000-0000-0000-000000000001");
+                user.put("email", "ada@example.invalid");
+                user.put("user_metadata", Map.of("first_name", "Ada", "last_name", "Example", "phone", "5550100"));
+                return new SupabaseAuthProvider.Response(200, user);
+            }
+            public SupabaseAuthProvider.Response put(String path, String token, Map<String, String> body) {
+                methods.add("PUT " + path); assertEquals("synthetic-access", token);
+                assertEquals(Map.of("data.first_name", "Ada", "data.last_name", "Example", "data.phone", "5550101"), body);
+                return get(path, token);
+            }
+        };
+        SupabaseAuthProvider provider = new SupabaseAuthProvider(transport, () -> 1000L);
+        AccountSession.Profile profile = provider.profile("synthetic-access");
+        assertEquals("ada@example.invalid", profile.email);
+        assertEquals("Ada", profile.firstName);
+        assertEquals("5550100", profile.phone);
+        provider.updateProfile("synthetic-access", " Ada ", "Example", "5550101");
+        assertEquals(Arrays.asList("GET /user", "PUT /user", "GET /user"), methods);
+    }
     @Test public void signupCarriesSyntheticProfileFields() throws Exception {
         SupabaseAuthProvider provider = new SupabaseAuthProvider((path, token, body) -> {
             assertEquals("Ada", body.get("data.first_name"));

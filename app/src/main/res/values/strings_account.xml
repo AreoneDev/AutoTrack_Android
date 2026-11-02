@@ -1,0 +1,30 @@
+<resources>
+    <string name="account_tab">Account</string>
+    <string name="account_title">ACCOUNT</string>
+    <string name="account_signed_in">Signed in</string>
+    <string name="account_id_label">Account ID</string>
+    <string name="account_session_description">Your leads and calendar belong to this account.</string>
+    <string name="account_settings">Settings</string>
+    <string name="account_sync_description">Review synchronization and resolve conflicts.</string>
+    <string name="account_notifications">Notification settings</string>
+    <string name="account_notifications_description">Manage notifications in Android settings.</string>
+    <string name="account_sign_out_description">Sign out on this device. Your account data stays separate from other accounts.</string>
+    <string name="account_settings_unavailable">Android notification settings are unavailable on this device.</string>
+    <string name="account_loading">Loading profile…</string>
+    <string name="account_profile_failed">Profile unavailable. Check your connection and try again.</string>
+    <string name="account_edit">Edit profile</string>
+    <string name="account_save">Save</string>
+    <string name="account_cancel">Cancel</string>
+    <string name="account_profile_format">Name: %1$s %2$s\nPhone: %3$s\nEmail: %4$s\nRole: %5$s</string>
+    <string name="account_role_unavailable">Not available</string>
+    <string name="account_appearance">Appearance</string>
+    <string name="account_language">Language</string>
+    <string name="account_support">Support</string>
+    <string name="account_support_unavailable">Support contact is not available yet.</string>
+    <string name="account_system">System default</string>
+    <string name="account_light">Light</string>
+    <string name="account_dark">Dark</string>
+    <string name="account_saved">Profile saved.</string>
+    <string name="account_retry">Retry</string>
+    <string name="nav_leads">Leads</string><string name="nav_calendar">Calendar</string><string name="nav_notifications">Notifications</string>
+</resources>

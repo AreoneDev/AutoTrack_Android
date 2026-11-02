@@ -1,4 +1,6 @@
 <resources>
+    <string-array name="task_type_labels"><item>Appointment</item><item>Test Drive</item><item>Follow-up</item><item>Other</item></string-array>
+    <string-array name="task_action_labels"><item>Edit Task</item><item>Delete Task</item><item>Cancel</item></string-array>
     <string name="app_name">AutoTrack</string>
 
     <string-array name="filter_status">

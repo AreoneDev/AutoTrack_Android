@@ -11,4 +11,8 @@
     <string name="sync_customer_conflict">Review conflict: %1$s</string>
     <string name="sync_deleted">Deleted</string>
     <string name="sync_compare_notes">Local notes: %1$s\nServer notes: %2$s</string>
+    <string name="sync_status_idle">Not synchronized yet</string>
+    <string name="sync_status_running">Synchronizing</string>
+    <string name="sync_status_complete">Synchronization complete; review any conflicts</string>
+    <string name="sync_status_offline">Offline or sync unavailable; changes remain on this device</string>
 </resources>

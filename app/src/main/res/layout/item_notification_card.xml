@@ -37,14 +37,14 @@
                 android:text="Incoming Message"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="#333333" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <TextView
                 android:id="@+id/tvNotificationLeadName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="From: Pengyu Chen"
-                android:textColor="#666666"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="10:45 AM"
-            android:textColor="#999999"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="12sp" />
 
     </LinearLayout>
