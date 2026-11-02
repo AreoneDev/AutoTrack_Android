@@ -16,3 +16,6 @@ local.properties
 # Local synthetic synchronization harness dependencies and generated bundles.
 /tools/sync-tests/node_modules/
 /tools/sync-tests/generated/
+
+# Locally prepared dedicated Supabase test bundles.
+/tools/supabase-test-env/generated/
