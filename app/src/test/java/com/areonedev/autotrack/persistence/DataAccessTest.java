@@ -122,7 +122,7 @@ public class DataAccessTest{
         assertNotNull("Leads list should not be null", leads);
         assertEquals(3, leads.size());
 
-        assertEquals("Alice Chen", leads.getFirst().getLeadName());
+        assertEquals("Alice Chen", leads.get(0).getLeadName());
     }
 
     @Test
@@ -188,8 +188,8 @@ public class DataAccessTest{
         assertEquals(1, results.size());
         dataAccess.getLeadSequential(leads);
         assertEquals(4, leads.size());
-        assertEquals("Alice Chen", leads.getFirst().getLeadName());
-        assertEquals("New User", leads.getLast().getLeadName());
+        assertEquals("Alice Chen", leads.get(0).getLeadName());
+        assertEquals("New User", leads.get(leads.size() - 1).getLeadName());
 
         // Identity-based duplicate: reinserting the persisted object must fail.
         assertEquals("Duplicate lead.", dataAccess.insertLead(testLead));
