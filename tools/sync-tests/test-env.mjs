@@ -37,6 +37,8 @@ test('real baseline, ownership, privilege correction and sync compose with isola
   try {
     await db.query('INSERT INTO auth.users VALUES ($1,$2),($3,$4)', [owner,"qa'owner@example.invalid",other,'other@example.invalid']);
     await db.exec(bundle.sql);
+    const receiptSecurity = await db.query("SELECT relrowsecurity FROM pg_class WHERE oid='autotrack_sync.operations'::regclass");
+    assert.equal(receiptSecurity.rows[0].relrowsecurity, true, 'the private operations table must enable RLS');
     assert.equal((await db.query('SELECT count(*)::int AS n FROM public.leads')).rows[0].n, 0);
     const columns = (await db.query("SELECT column_name FROM information_schema.columns WHERE table_name='imported_cars' AND table_schema='public' ORDER BY ordinal_position")).rows;
     assert.deepEqual(columns.map(row => row.column_name), ['Make','Year','Model','Category']);

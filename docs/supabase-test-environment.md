@@ -16,6 +16,8 @@ The generator rejects the existing application project reference and malformed r
 
 All four inputs run in one transaction. A missing/ambiguous owner or migration error rolls back the new application schema. Supabase supplies the real Auth schema and roles; the cloud bundle never creates mock roles, JWT helpers or Auth records. Nothing is added to the automatically applied `supabase/migrations` chain for this QA bootstrap.
 
+The generated bootstrap also enables RLS on `autotrack_sync.operations`, without adding client policies or grants. The security-definer function uses the table owner's privileges; do not force RLS on this table without revisiting the sync function. Local integration tests verify that the function can create and replay receipts while direct client access remains denied. Live Supabase behavior remains to be verified.
+
 ## Provisioning and operator confirmation
 
 1. Review this runbook, the SQL inputs and the local test results below.

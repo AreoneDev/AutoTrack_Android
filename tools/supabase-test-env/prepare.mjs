@@ -30,6 +30,9 @@ ${unwrap(base)}
 ${unwrap(ownership).replaceAll('__TEST_OWNER_EMAIL__', ownerEmail.replaceAll("'", "''"))}
 ${unwrap(hardening)}
 ${unwrap(sync)}
+-- The private receipt table remains inaccessible to client roles. Its owner
+-- executes the security-definer sync function and is not subject to RLS.
+ALTER TABLE autotrack_sync.operations ENABLE ROW LEVEL SECURITY;
 NOTIFY pgrst, 'reload schema';
 COMMIT;
 `;
