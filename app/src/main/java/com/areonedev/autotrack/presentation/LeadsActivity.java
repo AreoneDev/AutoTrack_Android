@@ -38,7 +38,7 @@ public class LeadsActivity extends AccountActivity {
     private FloatingActionButton fab;
     private ImageButton btnFilterToggle;
     private Button btnApply, btnReset;
-    private LinearLayout filterPanel;
+    private View filterPanel;
     private Spinner spinnerStatusFilter, spinnerStageFilter, spinnerDivisionFilter;
     private AutoCompleteTextView actvYear, actvMake, actvModel;
     private AccessLeads accessLeads;
@@ -53,7 +53,6 @@ public class LeadsActivity extends AccountActivity {
         super.onCreate(savedInstanceState);
         if (!com.areonedev.autotrack.auth.AuthRuntime.requireAccount(this)) return;
         setContentView(R.layout.activity_all_my_leads);
-        findViewById(R.id.auth_sign_out).setOnClickListener(view -> signOutAccount());
         findViewById(R.id.sync_review).setOnClickListener(view -> startActivity(new Intent(this,SyncActivity.class)));
 
         accessLeads = new AccessLeads();
@@ -119,9 +118,9 @@ public class LeadsActivity extends AccountActivity {
             spinnerStatusFilter.setSelection(0);
             spinnerStageFilter.setSelection(0);
             spinnerDivisionFilter.setSelection(0);
-            actvYear.setText("Year", false);
-            actvMake.setText("Make", false);
-            actvModel.setText("Model", false);
+            actvYear.setText("", false);
+            actvMake.setText("", false);
+            actvModel.setText("", false);
 
             // Reset the dropdown lists to default
             setupVehicleDropdowns();
@@ -147,24 +146,8 @@ public class LeadsActivity extends AccountActivity {
         // 5. FAB & Navigation
         fab.setOnClickListener(v -> startActivity(new Intent(this, LeadsCreationActivity.class)));
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_leads) {
-                recyclerView.smoothScrollToPosition(0);
-                return true;
-            }
-
-            Intent intent;
-            if (id == R.id.nav_calendar) intent = new Intent(this, CalendarActivity.class);
-            else if (id == R.id.nav_notifications)
-                intent = new Intent(this, NotificationsActivity.class);
-            else return false;
-
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-            overridePendingTransition(0, 0);
-            return true;
-        });
+        setupAccountNavigation(R.id.nav_leads);
+        bottomNav.setOnItemReselectedListener(item -> recyclerView.smoothScrollToPosition(0));
     }
 
     /**
@@ -175,12 +158,9 @@ public class LeadsActivity extends AccountActivity {
         String query = (searchView != null) ? searchView.getQuery().toString().trim() : "";
 
         // Use a helper to get Spinner text safely
-        String status = (spinnerStatusFilter.getSelectedItem() != null) ?
-                spinnerStatusFilter.getSelectedItem().toString() : "All Status";
-        String stage = (spinnerStageFilter.getSelectedItem() != null) ?
-                spinnerStageFilter.getSelectedItem().toString() : "All Stages";
-        String division = (spinnerDivisionFilter.getSelectedItem() != null) ?
-                spinnerDivisionFilter.getSelectedItem().toString() : "All Divisions";
+        String status = FilterValues.status(spinnerStatusFilter.getSelectedItemPosition());
+        String stage = FilterValues.stage(spinnerStageFilter.getSelectedItemPosition());
+        String division = FilterValues.division(spinnerDivisionFilter.getSelectedItemPosition());
 
         // Get specific vehicle selections
         String year = actvYear.getText().toString().trim();

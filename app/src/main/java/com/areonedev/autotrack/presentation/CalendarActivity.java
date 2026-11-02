@@ -122,7 +122,7 @@ public class CalendarActivity extends AccountActivity {
 
         // 5. Update the Agenda Header text
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM dd", Locale.getDefault());
-        tvAgendaHeader.setText("Agenda for " + sdf.format(date));
+        tvAgendaHeader.setText(getString(R.string.agenda_for, sdf.format(date)));
     }
 
     private void initViews() {
@@ -176,30 +176,7 @@ public class CalendarActivity extends AccountActivity {
     }
 
     private void setupBottomNav() {
-        bottomNav.setSelectedItemId(R.id.nav_calendar);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_calendar) {
-                return true;
-            }
-            Intent intent;
-            if (id == R.id.nav_leads) {
-                intent = new Intent(CalendarActivity.this, LeadsActivity.class);
-            } else if (id == R.id.nav_notifications) {
-                // ADDED: Logic to navigate to Notifications
-                intent = new Intent(CalendarActivity.this, NotificationsActivity.class);
-            } else {
-                return false;
-            }
-
-            // Use REORDER_TO_FRONT to prevent freezing/re-initializing the database
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-
-            // Optional: Use 0,0 transition for a "tab-like" feel
-            overridePendingTransition(0, 0);
-            return true;
-        });
+        setupAccountNavigation(R.id.nav_calendar);
     }
 
     @Override

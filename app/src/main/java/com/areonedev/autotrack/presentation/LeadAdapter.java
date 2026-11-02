@@ -59,7 +59,9 @@ public class LeadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             lvh.name.setText(lead.getLeadFirstName() + " " + lead.getLeadLastName());
             lvh.phone.setText(lead.getLeadPhoneNumber());
-            lvh.stage.setText(lead.getLeadStage());
+            int stage = FilterValues.stagePosition(lead.getLeadStage());
+            String[] labels = lvh.itemView.getResources().getStringArray(R.array.filter_stages);
+            lvh.stage.setText(stage >= 0 && stage < labels.length ? labels[stage] : lead.getLeadStage());
 
             // --- VEHICLE DISPLAY LOGIC ---
             Vehicle vi = lead.getLeadVehicleInterest();
@@ -94,13 +96,16 @@ public class LeadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 });
             } else {
-                lvh.vehicle.setText("No Vehicle Interest");
+                lvh.vehicle.setText(R.string.no_vehicle);
             }
         }
         else if (holder instanceof HeaderViewHolder && item instanceof String) {
             // 2. Handle the Header display
             HeaderViewHolder hvh = (HeaderViewHolder) holder;
-            hvh.dateText.setText((String) item);
+            String label = (String) item;
+            if (label.equals("Today")) hvh.dateText.setText(R.string.date_today);
+            else if (label.equals("Yesterday")) hvh.dateText.setText(R.string.date_yesterday);
+            else hvh.dateText.setText(label);
         }
     }
 

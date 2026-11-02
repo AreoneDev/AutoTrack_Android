@@ -82,7 +82,7 @@ public class LeadWorkflowTest {
             scenario.onActivity(a -> ((SearchView) a.findViewById(R.id.searchView)).setQuery("Synthetic Workflow", false));
             rowCount(1);
             onView(withId(R.id.btnFilterToggle)).perform(click());
-            onView(withId(R.id.btnResetFilters)).perform(click());
+            onView(withId(R.id.btnResetFilters)).perform(scrollTo(), click());
             rowCount(leads().size());
             scenario.onActivity(a -> ((SearchView) a.findViewById(R.id.searchView)).setQuery("no-such-synthetic-customer", false));
             rowCount(0);
@@ -94,10 +94,10 @@ public class LeadWorkflowTest {
         assertNull(database.dao.insertLead(lead));
         try (ActivityScenario<LeadsActivity> scenario = ActivityScenario.launch(LeadsActivity.class)) {
             scenario.onActivity(a -> ((SearchView) a.findViewById(R.id.searchView)).setQuery("Synthetic Workflow", false));
-            onView(withText("Synthetic Workflow")).perform(click());
+            onView(allOf(withId(R.id.text_lead_name), withText("Synthetic Workflow"))).perform(click());
             onView(withId(R.id.action_edit)).perform(click());
             onView(withId(R.id.etDetFirstName)).perform(replaceText("Edited"), closeSoftKeyboard());
-            onView(withId(R.id.btnUpdateLead)).perform(click());
+            onView(withId(R.id.btnUpdateLead)).perform(scrollTo(), click());
             assertEquals("Edited Workflow", database.dao.getLeadRandom(lead).get(0).getLeadName());
             // Business expectation: saving must return to view mode. Known toggle bug must not be hidden.
             onView(withId(R.id.layoutViewMode)).check(matches(isDisplayed()));
@@ -108,12 +108,12 @@ public class LeadWorkflowTest {
         assertNull(database.dao.insertLead(lead));
         try (ActivityScenario<LeadsActivity> scenario = ActivityScenario.launch(LeadsActivity.class)) {
             scenario.onActivity(a -> ((SearchView) a.findViewById(R.id.searchView)).setQuery("Synthetic Delete", false));
-            onView(withText("Synthetic Delete")).perform(click());
+            onView(allOf(withId(R.id.text_lead_name), withText("Synthetic Delete"))).perform(click());
             onView(withId(R.id.action_edit)).perform(click());
-            onView(withId(R.id.btnDeleteLead)).perform(click());
+            onView(withId(R.id.btnDeleteLead)).perform(scrollTo(), click());
             onView(withText("Cancel")).inRoot(androidx.test.espresso.matcher.RootMatchers.isDialog()).perform(click());
             assertEquals(1, database.dao.getLeadRandom(lead).size());
-            onView(withId(R.id.btnDeleteLead)).perform(click());
+            onView(withId(R.id.btnDeleteLead)).perform(scrollTo(), click());
             onView(withText("Delete")).inRoot(androidx.test.espresso.matcher.RootMatchers.isDialog()).perform(click());
             assertTrue(database.dao.getLeadRandom(lead).isEmpty());
         }
@@ -139,14 +139,15 @@ public class LeadWorkflowTest {
             scenario.onActivity(a -> ((SearchView) a.findViewById(R.id.searchView)).setQuery("Filter", false));
             rowCount(2);
             onView(withId(R.id.btnFilterToggle)).perform(click());
-            onView(withId(R.id.spinnerStatusFilter)).perform(click());
+            onView(withId(R.id.spinnerStatusFilter)).perform(scrollTo(), click());
             onData(allOf(is(instanceOf(String.class)), is("Lost"))).perform(click());
-            onView(withId(R.id.spinnerStageFilter)).perform(click());
+            onView(withId(R.id.spinnerStageFilter)).perform(scrollTo(), click());
             onData(allOf(is(instanceOf(String.class)), is("New"))).perform(click());
-            onView(withId(R.id.btnApplyFilters)).perform(click());
+            onView(withId(R.id.btnApplyFilters)).perform(scrollTo(), click());
             rowCount(1);
             onView(withText("Filter Lost")).check(matches(isDisplayed()));
-            onView(withId(R.id.btnResetFilters)).perform(click());
+            onView(withId(R.id.btnFilterToggle)).perform(click());
+            onView(withId(R.id.btnResetFilters)).perform(scrollTo(), click());
             rowCount(leads().size());
         }
     }

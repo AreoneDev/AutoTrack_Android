@@ -1,0 +1,20 @@
+<resources>
+    <string name="account_tab">账户</string><string name="account_title">账户</string>
+    <string name="account_signed_in">已登录</string><string name="account_id_label">账户 ID</string>
+    <string name="account_settings">设置</string><string name="account_loading">正在加载资料…</string>
+    <string name="account_profile_failed">无法加载资料，请检查网络连接后重试。</string>
+    <string name="account_edit">编辑资料</string><string name="account_save">保存</string><string name="account_cancel">取消</string>
+    <string name="account_profile_format">姓名：%1$s %2$s\n电话：%3$s\n邮箱：%4$s\n角色：%5$s</string>
+    <string name="account_role_unavailable">暂不可用</string><string name="account_appearance">外观</string>
+    <string name="account_language">语言</string><string name="account_support">支持</string>
+    <string name="account_support_unavailable">暂未提供支持联系方式。</string>
+    <string name="account_system">跟随系统</string><string name="account_light">浅色</string><string name="account_dark">深色</string>
+    <string name="account_saved">资料已保存。</string><string name="account_retry">重试</string>
+    <string name="account_notifications">通知设置</string><string name="account_notifications_description">在 Android 设置中管理通知。</string>
+    <string name="account_sync_description">查看同步状态并解决冲突。</string>
+    <string name="account_sign_out_description">在此设备上退出登录。你的账户数据与其他账户隔离。</string>
+    <string name="account_settings_unavailable">此设备无法打开 Android 通知设置。</string>
+    <string name="auth_first_name">名</string><string name="auth_last_name">姓</string><string name="auth_phone">电话号码</string>
+    <string name="auth_profile_required">请输入名字、姓氏和电话号码。</string><string name="auth_sign_out">退出登录</string>
+    <string name="nav_leads">客户</string><string name="nav_calendar">日历</string><string name="nav_notifications">通知</string><string name="sync_review">同步</string>
+</resources>

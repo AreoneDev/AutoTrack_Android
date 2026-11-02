@@ -44,7 +44,7 @@ public class TaskWorkflowTest {
     @Test public void createCompleteReopenEditAndDeleteTask() {
         try (ActivityScenario<LeadDetailsActivity> scenario = launch()) {
             assertTrue(tasks().isEmpty());
-            onView(withId(R.id.btnAddTask)).perform(click());
+            onView(withId(R.id.btnAddTask)).perform(scrollTo(), click());
             chooseTaskTypeAndDefaultDateTime("Appointment");
             dialogText("Synthetic task");
             onView(withText("Confirm & Save")).inRoot(isDialog()).perform(click());
@@ -52,20 +52,20 @@ public class TaskWorkflowTest {
             Task saved = tasks().get(0);
             assertEquals("Appointment: Synthetic task", saved.getTitle());
             assertFalse(saved.isCompleted());
-            onView(withId(R.id.ivTimelineStatus)).perform(click());
+            onView(withId(R.id.ivTimelineStatus)).perform(scrollTo(), click());
             assertTrue(tasks().get(0).isCompleted());
             scenario.recreate();
             assertTrue(tasks().get(0).isCompleted());
-            onView(withId(R.id.ivTimelineStatus)).perform(click());
+            onView(withId(R.id.ivTimelineStatus)).perform(scrollTo(), click());
             assertFalse(tasks().get(0).isCompleted());
-            onView(withText(containsString("Synthetic task"))).perform(click());
+            onView(withText(containsString("Synthetic task"))).perform(scrollTo(), click());
             onView(withText("Edit Task")).inRoot(isDialog()).perform(click());
             chooseTaskTypeAndDefaultDateTime("Follow-up");
             dialogText("Synthetic edited");
             onView(withText("Save Changes")).inRoot(isDialog()).perform(click());
             assertEquals(saved.getEventID(), tasks().get(0).getEventID());
             assertEquals("Follow-up: Synthetic edited", tasks().get(0).getTitle());
-            onView(withText(containsString("Synthetic edited"))).perform(click());
+            onView(withText(containsString("Synthetic edited"))).perform(scrollTo(), click());
             onView(withText("Delete Task")).inRoot(isDialog()).perform(click());
             onView(withText("Delete")).inRoot(isDialog()).perform(click());
             assertTrue(tasks().isEmpty());
@@ -74,7 +74,7 @@ public class TaskWorkflowTest {
     @Test public void cancelTaskDetailsDoesNotPersist() {
         try (ActivityScenario<LeadDetailsActivity> scenario = launch()) {
             int before = tasks().size();
-            onView(withId(R.id.btnAddTask)).perform(click());
+            onView(withId(R.id.btnAddTask)).perform(scrollTo(), click());
             chooseTaskTypeAndDefaultDateTime("Other");
             dialogText("Cancelled synthetic task");
             onView(withText("Cancel")).inRoot(isDialog()).perform(click());

@@ -1,0 +1,22 @@
+<resources>
+    <string-array name="task_type_labels"><item>Rendez-vous</item><item>Essai routier</item><item>Suivi</item><item>Autre</item></string-array>
+    <string-array name="task_action_labels"><item>Modifier la tâche</item><item>Supprimer la tâche</item><item>Annuler</item></string-array>
+    <string-array name="filter_status">
+        <item>Tous les statuts</item>
+        <item>Actif</item>
+        <item>Perdu</item>
+    </string-array>
+    <string-array name="filter_stages">
+        <item>Toutes les étapes</item>
+        <item>Nouveau</item>
+        <item>Contacté</item>
+        <item>Visité</item>
+        <item>Essai routier</item>
+        <item>Négociation</item>
+    </string-array>
+    <string-array name="filter_division">
+        <item>Toutes les divisions</item>
+        <item>Voiture neuve</item>
+        <item>Voiture d’occasion</item>
+    </string-array>
+</resources>

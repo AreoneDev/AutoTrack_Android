@@ -71,38 +71,14 @@ public class NotificationsActivity extends AccountActivity {
                     adapter.notifyDataSetChanged();
                 } else {
                     Log.e(TAG, "Failed to load notifications: " + error);
-                    Toast.makeText(this, "Error: " + error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.error_detail, error), Toast.LENGTH_SHORT).show();
                 }
             });
         }).start();
     }
 
     private void setupNavigation() {
-        bottomNavigationView.setSelectedItemId(R.id.nav_notifications);
-
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_notifications) {
-                return true;
-            }  Intent intent;
-            if (id == R.id.nav_leads) {
-                intent = new Intent(this, LeadsActivity.class);
-            } else if (id == R.id.nav_calendar) {
-                intent = new Intent(this, CalendarActivity.class);
-            } else {
-                return false;
-            }
-
-            // Use REORDER_TO_FRONT to prevent the "Freeze" and reuse the existing page
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-
-            // Smooth tab-like transition
-            overridePendingTransition(0, 0);
-
-            return true;
-        });
+        setupAccountNavigation(R.id.nav_notifications);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.areonedev.autotrack.presentation;
 
+import com.areonedev.autotrack.R;
+
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -68,14 +70,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         String missionDesc = scoringService.getScientificMission(lead,selectedDate);
 
         // Fallback if the mission returns null (though your filter should prevent this)
-        if (missionDesc == null) missionDesc = "Routine Follow-up";
+        missionDesc = MissionText.display(holder.itemView.getContext(), missionDesc, lead.getLeadStage(), (int) score);
 
-        String missionTitle = getMissionTitle(lead);
+        String missionTitle = holder.itemView.getContext().getString(MissionStage.resource(lead.getLeadStage()));
         // Line 1: Name + Mission Title (e.g., "John Doe | 🏎️ Test Drive")
-        holder.tvName.setText(String.format("%s %s | %s", lead.getLeadFirstName(), lead.getLeadLastName(), lead.getLeadStage()));
+        int stagePosition = FilterValues.stagePosition(lead.getLeadStage());
+        String[] stageLabels = holder.itemView.getResources().getStringArray(R.array.filter_stages);
+        String stageLabel = stagePosition >= 0 ? stageLabels[stagePosition] : lead.getLeadStage();
+        holder.tvName.setText(String.format("%s %s | %s", lead.getLeadFirstName(), lead.getLeadLastName(), stageLabel));
 
         // Line 2: Mission Description + Stage (Scientific Context)
-        String performanceText = String.format("Mission: %s [%s]", missionDesc, missionTitle);
+        String performanceText = holder.itemView.getContext().getString(R.string.mission_summary, missionDesc, missionTitle);
         holder.tvStage.setText(performanceText);
 
         // 1. Get "Today" at midnight
@@ -99,20 +104,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         boolean isCompleted = "CLOSED".equalsIgnoreCase(lead.getLeadStage()); // Example condition
 
         if (isCompleted||isPastTask) {
-            holder.tvName.setTextColor(Color.GRAY);
+            holder.tvName.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurfaceVariant));
             holder.tvStage.setTextColor(Color.LTGRAY);
             holder.itemView.setAlpha(0.6f); // Make the whole row look faded
             holder.tvName.setTypeface(null, Typeface.NORMAL);
         } else {
             holder.itemView.setAlpha(1.0f);
             if (score >= THRESHOLD) {
-                holder.tvName.setTextColor(Color.RED); // High priority
+                holder.tvName.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorError));
                 holder.tvName.setTypeface(null, Typeface.BOLD);
             } else {
-                holder.tvName.setTextColor(Color.BLACK);
+                holder.tvName.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurface));
                 holder.tvName.setTypeface(null, Typeface.NORMAL);
             }
-            holder.tvStage.setTextColor(Color.DKGRAY);
+            holder.tvStage.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurfaceVariant));
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -122,18 +127,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             intent.putExtra("SELECTED_LEAD", lead);
             v.getContext().startActivity(intent);
         });
-    }
-
-    // Helper for Title
-    private String getMissionTitle(Lead lead) {
-        String stage = (lead.getLeadStage() != null) ? lead.getLeadStage().toUpperCase() : "NEW";
-        switch (stage) {
-            case "NEW": return "👋 Initial Contact";
-            case "DISCOVERY": return "🔍 Discovery";
-            case "TEST DRIVE": return "🏎️ Test Drive";
-            case "NEGOTIATION": return "🤝 Negotiation";
-            default: return "📞 Follow-up";
-        }
     }
 
     @Override

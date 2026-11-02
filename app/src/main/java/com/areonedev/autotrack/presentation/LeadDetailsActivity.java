@@ -45,7 +45,8 @@ import java.util.ArrayList;
 public class LeadDetailsActivity extends AccountActivity {
 
     // Layout Containers
-    private LinearLayout layoutViewMode, llStatusToggle,layoutEditMode;
+    private View layoutViewMode, layoutEditMode;
+    private LinearLayout llStatusToggle;
     private RecyclerView rvTimeline;
 
     // View Mode Components
@@ -95,7 +96,7 @@ public class LeadDetailsActivity extends AccountActivity {
         if (currentLead != null) {
             refreshUI();
         } else {
-            Toast.makeText(this, "Error: Lead data not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.lead_not_found, Toast.LENGTH_SHORT).show();
             finish(); // Close activity if no data
         }
 
@@ -121,7 +122,7 @@ public class LeadDetailsActivity extends AccountActivity {
         // 3. Now configure the back button and title
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Lead Details");
+            getSupportActionBar().setTitle(R.string.lead_details);
         }
     }
 
@@ -173,12 +174,13 @@ public class LeadDetailsActivity extends AccountActivity {
         // 1. Status Toggle (Active/Lost)
         llStatusToggle.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, llStatusToggle);
-            popup.getMenu().add("Active");
-            popup.getMenu().add("Lost");
+            String[] statusLabels = getResources().getStringArray(R.array.filter_status);
+            popup.getMenu().add(0, 1, 0, statusLabels[1]);
+            popup.getMenu().add(0, 2, 1, statusLabels[2]);
 
             popup.setOnMenuItemClickListener(item -> {
                 String selectedTitle = item.getTitle().toString();
-                boolean isActive = selectedTitle.equalsIgnoreCase("Active");
+                boolean isActive = item.getItemId() == 1;
 
                 currentLead.setLeadStatus(isActive);
 
@@ -186,7 +188,7 @@ public class LeadDetailsActivity extends AccountActivity {
                 String result = accessLeads.updateLead(currentLead);
                 if (result == null) {
                     refreshUI(); // Update the dot color and text label
-                    Toast.makeText(this, "Status updated to " + selectedTitle, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.status_updated, selectedTitle), Toast.LENGTH_SHORT).show();
                 }
                 return true;
             });
@@ -198,14 +200,14 @@ public class LeadDetailsActivity extends AccountActivity {
             if (currentLead == null || currentLead.getLeadPhoneNumber() == null) return;
 
             new AlertDialog.Builder(this)
-                    .setTitle("Call Lead")
-                    .setMessage("Call " + currentLead.getLeadFirstName() + " at " + currentLead.getLeadPhoneNumber() + "?")
-                    .setPositiveButton("Call", (dialog, which) -> {
+                    .setTitle(R.string.call_lead)
+                    .setMessage(getString(R.string.call_confirm, currentLead.getLeadFirstName(), currentLead.getLeadPhoneNumber()))
+                    .setPositiveButton(R.string.call, (dialog, which) -> {
                         Intent intent = new Intent(Intent.ACTION_DIAL);
                         intent.setData(Uri.parse("tel:" + currentLead.getLeadPhoneNumber()));
                         startActivity(intent);
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.cancel, null)
                     .show();
         });
 
@@ -360,10 +362,10 @@ public class LeadDetailsActivity extends AccountActivity {
 
         // Update Status Dot and Label based on boolean
         if (currentLead.getLeadStatus()) { // if true (Active)
-            tvStatusLabel.setText("Active");
+            tvStatusLabel.setText(getResources().getStringArray(R.array.filter_status)[1]);
             viewStatusDot.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#4CAF50")));
         } else { // if false (Lost)
-            tvStatusLabel.setText("Lost");
+            tvStatusLabel.setText(getResources().getStringArray(R.array.filter_status)[2]);
             viewStatusDot.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
         }
 
@@ -382,7 +384,7 @@ public class LeadDetailsActivity extends AccountActivity {
 
             updateDependentAdapters(v);
         }else {
-            tvViewVehicle.setText("No vehicle selected");
+            tvViewVehicle.setText(R.string.no_vehicle_selected);
             actvYear.setText("");
             actvMake.setText("");
             actvModel.setText("");
@@ -392,13 +394,13 @@ public class LeadDetailsActivity extends AccountActivity {
         // 5. Set Dates
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault());
         if (currentLead.getLeadFollowUpDate() != null) {
-            tvDetUpdatedDate.setText("Last Updated: " + sdf.format(currentLead.getLeadFollowUpDate()));
+            tvDetUpdatedDate.setText(getString(R.string.last_updated, sdf.format(currentLead.getLeadFollowUpDate())));
         }else{
             // Hide if there's no update yet to keep the bottom clean
             tvDetUpdatedDate.setVisibility(View.GONE);
         }
         if (currentLead.getLeadCreatedAt() != null) {
-            tvDetDate.setText("Created: " + sdf.format(currentLead.getLeadCreatedAt()));
+            tvDetDate.setText(getString(R.string.created_on, sdf.format(currentLead.getLeadCreatedAt())));
         }
 
         // 6. Populate Edit Mode Fields (Hidden until Edit is clicked)
@@ -531,11 +533,11 @@ public class LeadDetailsActivity extends AccountActivity {
         if (isEditMode) {
             layoutViewMode.setVisibility(View.GONE);
             layoutEditMode.setVisibility(View.VISIBLE);
-            if (getSupportActionBar() != null) getSupportActionBar().setTitle("Edit Lead");
+            if (getSupportActionBar() != null) getSupportActionBar().setTitle(R.string.edit_lead);
         } else {
             layoutViewMode.setVisibility(View.VISIBLE);
             layoutEditMode.setVisibility(View.GONE);
-            if (getSupportActionBar() != null) getSupportActionBar().setTitle("Lead Details");
+            if (getSupportActionBar() != null) getSupportActionBar().setTitle(R.string.lead_details);
             refreshUI(); // Reset fields if they cancelled
         }
     }
@@ -571,42 +573,40 @@ public class LeadDetailsActivity extends AccountActivity {
 
         String result = accessLeads.updateLead(currentLead);
         if (result == null) {
-            Toast.makeText(this, "Lead updated", Toast.LENGTH_SHORT).show();
-            isEditMode = false; // Switch back to view mode
+            Toast.makeText(this, R.string.lead_updated, Toast.LENGTH_SHORT).show();
             toggleEditMode(); // Switch back to view mode
-            refreshUI();      // Show new data in cards
         } else {
-            Toast.makeText(this, "Error: " + result, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_detail, result), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void showDeleteConfirmation() {
         // Ensure we have a valid lead to delete
         if (currentLead == null) {
-            Toast.makeText(this, "Error: No lead selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_lead_selected, Toast.LENGTH_SHORT).show();
             return;
         }
 
         new AlertDialog.Builder(this)
-                .setTitle("Delete Lead")
-                .setMessage("Are you sure you want to delete " + currentLead.getLeadFirstName() + "? This action cannot be undone.")
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.delete_lead)
+                .setMessage(getString(R.string.delete_lead_confirm, currentLead.getLeadFirstName()))
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
                     // Call the business logic layer to delete
                     String result = accessLeads.deleteLead(currentLead);
 
                     if (result == null) {
                         // Success!
-                        Toast.makeText(this, "Lead deleted successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.lead_deleted, Toast.LENGTH_SHORT).show();
 
                         // Set a result code so the previous activity (Calendar/AllLeads) knows to refresh
                         setResult(RESULT_OK);
                         finish();
                     } else {
                         // Failure: Show the specific error message from the database/business layer
-                        Toast.makeText(this, "Delete failed: " + result, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.delete_failed, result), Toast.LENGTH_LONG).show();
                     }
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
@@ -618,12 +618,12 @@ public class LeadDetailsActivity extends AccountActivity {
 
     private void showAddTaskDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Schedule New Task");
+        builder.setTitle(R.string.schedule_task);
 
         // These keywords are recognized by your ScoringService for the +25 bonus
         String[] taskTypes = {"Appointment", "Test Drive", "Follow-up", "Other"};
 
-        builder.setItems(taskTypes, (dialog, which) -> {
+        builder.setItems(getResources().getStringArray(R.array.task_type_labels), (dialog, which) -> {
             String selectedType = taskTypes[which];
             promptForTaskDetails(selectedType);
         });
@@ -655,20 +655,20 @@ public class LeadDetailsActivity extends AccountActivity {
 
     private void showOptionalDetailsDialog(String type, Date selectedDate) {
         EditText etInput = new EditText(this);
-        etInput.setHint("Details (Optional)");
+        etInput.setHint(R.string.details_optional);
 
         // Format the date for the dialog title so the user sees what they picked
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault());
 
         new AlertDialog.Builder(this)
-                .setTitle("Details for " + type)
-                .setMessage("Scheduled for: " + sdf.format(selectedDate))
+                .setTitle(getString(R.string.details_for, type))
+                .setMessage(getString(R.string.scheduled_for, sdf.format(selectedDate)))
                 .setView(etInput)
-                .setPositiveButton("Confirm & Save", (dialog, which) -> {
+                .setPositiveButton(R.string.confirm_save, (dialog, which) -> {
                     String note = etInput.getText().toString();
                     saveManualTask(type, note, selectedDate);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -680,11 +680,11 @@ public class LeadDetailsActivity extends AccountActivity {
         String result = accessTasks.insertTask(newTask);
 
         if (result == null) {
-            Toast.makeText(this, "Task Saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.task_saved, Toast.LENGTH_SHORT).show();
             // 4. Refresh UI so the new task appears on the timeline immediately
             refreshUI();
         } else {
-            Toast.makeText(this, "Error saving task: " + result, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.task_error, result), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -692,15 +692,15 @@ public class LeadDetailsActivity extends AccountActivity {
         if (task.getEventID() <= 0) {
             String result = accessTasks.insertTask(task);
             if (result != null) {
-                Toast.makeText(this, "Failed to access tasks", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.failed_tasks, Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
-        String[] options = {"Edit Task", "Delete Task", "Cancel"};
+        String[] options = getResources().getStringArray(R.array.task_action_labels);
 
         new AlertDialog.Builder(this)
-                .setTitle("Manage Task")
+                .setTitle(R.string.manage_task)
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
                         showEditTaskDialog(task);
@@ -716,13 +716,13 @@ public class LeadDetailsActivity extends AccountActivity {
         String[] taskTypes = {"Appointment", "Test Drive", "Follow-up", "Other"};
 
         new AlertDialog.Builder(this)
-                .setTitle("Update Task Type")
-                .setItems(taskTypes, (dialog, which) -> {
+                .setTitle(R.string.update_task_type)
+                .setItems(getResources().getStringArray(R.array.task_type_labels), (dialog, which) -> {
                     String selectedType = taskTypes[which];
                     // Proceed to Date/Time selection specific to Editing
                     promptForEditDetails(task, selectedType);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -757,16 +757,16 @@ public class LeadDetailsActivity extends AccountActivity {
         String currentTitle = task.getTitle();
         String existingNote = currentTitle.contains(":") ? currentTitle.split(":", 2)[1].trim() : "";
         etInput.setText(existingNote);
-        etInput.setHint("Update details (Optional)");
+        etInput.setHint(R.string.update_details);
 
         // UI Padding for the EditText
         int padding = (int) (16 * getResources().getDisplayMetrics().density);
         etInput.setPadding(padding, padding, padding, padding);
 
         new AlertDialog.Builder(this)
-                .setTitle("Finalize Changes")
+                .setTitle(R.string.finalize_changes)
                 .setView(etInput)
-                .setPositiveButton("Save Changes", (dialog, which) -> {
+                .setPositiveButton(R.string.save_changes, (dialog, which) -> {
                     String note = etInput.getText().toString();
 
                     // Reconstruct title to maintain "Type: Note" format for ScoringService
@@ -779,30 +779,30 @@ public class LeadDetailsActivity extends AccountActivity {
                     // Persist changes to SQLite
                     String result = accessTasks.updateTask(task);
                     if (result == null) {
-                        Toast.makeText(this, "Task Updated", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.task_updated, Toast.LENGTH_SHORT).show();
                         refreshUI(); // Refresh timeline and engagement score
                     } else {
-                        Toast.makeText(this, "Update failed: " + result, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.update_failed, result), Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
     private void showDeleteTaskConfirmation(Task task) {
         new AlertDialog.Builder(this)
-                .setTitle("Delete Task")
-                .setMessage("Are you sure you want to remove this task?")
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.delete_task)
+                .setMessage(R.string.delete_task_question)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
                     String result = accessTasks.deleteTask(task);
                     if (result == null) {
-                        Toast.makeText(this, "Task removed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.task_removed, Toast.LENGTH_SHORT).show();
                         refreshUI();
                     } else {
-                        Toast.makeText(this, "Delete failed: " + result, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.delete_failed, result), Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 }

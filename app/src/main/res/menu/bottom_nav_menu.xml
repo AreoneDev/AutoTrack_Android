@@ -3,13 +3,17 @@
     <item
         android:id="@+id/nav_leads"
         android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Leads" />
+        android:title="@string/nav_leads" />
     <item
         android:id="@+id/nav_calendar"
         android:icon="@android:drawable/ic_menu_today"
-        android:title="Calendar" />
+        android:title="@string/nav_calendar" />
     <item
         android:id="@+id/nav_notifications"
         android:icon="@android:drawable/ic_dialog_email"
-        android:title="Notifications" />
+        android:title="@string/nav_notifications" />
+    <item
+        android:id="@+id/nav_account"
+        android:icon="@drawable/ic_account"
+        android:title="@string/account_tab" />
 </menu>

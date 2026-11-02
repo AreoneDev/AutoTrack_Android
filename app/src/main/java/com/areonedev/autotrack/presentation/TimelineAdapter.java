@@ -75,7 +75,21 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
         // 1. Update Date Format to show Time (HH:mm)
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault());
 
-        holder.tvTitle.setText(task.getTitle());
+        String displayTitle = task.getTitle();
+        int generated = MissionText.resource(displayTitle);
+        if (generated != 0 && generated != R.string.mission_high && generated != R.string.mission_standard) {
+            displayTitle = holder.itemView.getContext().getString(generated);
+        } else {
+            String[] canonical = {"Appointment", "Test Drive", "Follow-up", "Other"};
+            String[] translated = holder.itemView.getResources().getStringArray(R.array.task_type_labels);
+            for (int i = 0; i < canonical.length; i++) {
+                if (displayTitle.equals(canonical[i]) || displayTitle.startsWith(canonical[i] + ":")) {
+                    displayTitle = translated[i] + displayTitle.substring(canonical[i].length());
+                    break;
+                }
+            }
+        }
+        holder.tvTitle.setText(displayTitle);
         holder.tvDate.setText(dateTimeFormat.format(task.getDate()));
 
         // 2. Identify High-Intent Tasks (Appointments/Test Drives)
@@ -94,20 +108,20 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
         // 3. Apply Visual States
         if (task.isCompleted()) {
             // COMPLETED: Gray out
-            holder.tvTitle.setTextColor(Color.GRAY);
-            holder.tvDate.setTextColor(Color.GRAY);
+            holder.tvTitle.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurfaceVariant));
+            holder.tvDate.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurfaceVariant));
             holder.ivCheck.setImageResource(R.drawable.ic_check_circle_gray);
             holder.itemView.setBackgroundColor(Color.TRANSPARENT);
         } else if (taskDate.before(today)) {
             // OVERDUE: Red
-            holder.tvTitle.setTextColor(Color.RED);
-            holder.tvTitle.setText("⚠️ OVERDUE: " + task.getTitle());
-            holder.tvDate.setTextColor(Color.RED);
+            holder.tvTitle.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnErrorContainer));
+            holder.tvTitle.setText(holder.itemView.getContext().getString(R.string.overdue, displayTitle));
+            holder.tvDate.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnErrorContainer));
             holder.ivCheck.setImageResource(R.drawable.ic_radio_button_unchecked);
-            holder.itemView.setBackgroundColor(Color.parseColor("#FFF0F0"));
+            holder.itemView.setBackgroundColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorErrorContainer));
         } else {
             // PENDING: Standard or High-Intent Highlight
-            holder.tvTitle.setTextColor(Color.BLACK);
+            holder.tvTitle.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurface));
             holder.itemView.setBackgroundColor(Color.TRANSPARENT);
 
             if (isHighIntent) {
@@ -115,7 +129,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
                 holder.tvTitle.setTextColor(Color.parseColor("#4CAF50"));
                 holder.tvDate.setTextColor(Color.parseColor("#4CAF50"));
             } else if (task.getTitle().contains("URGENT")) {
-                holder.tvDate.setTextColor(Color.RED);
+                holder.tvDate.setTextColor(com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorError));
             } else {
                 holder.tvDate.setTextColor(Color.parseColor("#4CAF50")); // Green
             }

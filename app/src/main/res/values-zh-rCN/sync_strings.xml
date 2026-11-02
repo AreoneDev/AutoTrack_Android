@@ -1,0 +1,11 @@
+<resources>
+    <string name="sync_now">同步并刷新</string><string name="sync_conflict">查看客户冲突</string>
+    <string name="sync_choose">两台设备都修改了此客户。保留本地副本还是接受服务器副本？接受服务器副本将丢弃待处理的本地更改。如果服务器已删除客户，保留本地副本也无法恢复该客户。</string>
+    <string name="sync_keep_local">保留本地</string><string name="sync_keep_remote">接受服务器副本</string>
+    <string name="sync_unavailable">无法同步，待处理的更改已保留。</string>
+    <string name="sync_resolution_failed">无法解决冲突。如果客户已在服务器上删除，请接受删除或创建新客户。</string>
+    <string name="sync_customer_conflict">查看冲突：%1$s</string><string name="sync_deleted">已删除</string>
+    <string name="sync_compare_notes">本地备注：%1$s\n服务器备注：%2$s</string>
+    <string name="sync_status_idle">尚未同步</string><string name="sync_status_running">正在同步</string>
+    <string name="sync_status_complete">同步完成，请检查冲突</string><string name="sync_status_offline">离线或无法同步，更改保留在此设备上</string>
+</resources>

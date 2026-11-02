@@ -1,0 +1,24 @@
+<resources>
+    <string name="auth_title">Connexion à AutoTrack</string>
+    <string name="auth_email">Courriel</string>
+    <string name="auth_continue">Continuer</string>
+    <string name="auth_password">Mot de passe</string>
+    <string name="auth_sign_in">Se connecter</string>
+    <string name="auth_register">S’inscrire</string>
+    <string name="auth_create_account">Créer un compte</string>
+    <string name="auth_back_to_login">Retour à la connexion</string>
+    <string name="auth_registration_hint">Saisissez votre courriel et un mot de passe pour créer un compte.</string>
+    <string name="auth_registration_failed">Impossible de créer le compte. Vérifiez vos informations ou connectez-vous.</string>
+    <string name="auth_confirmation_required">Si votre compte peut être créé, consultez le lien de confirmation dans votre courriel.</string>
+    <string name="auth_retry_logout">Réessayer la déconnexion</string>
+    <string name="auth_logout_pending">Votre compte est verrouillé, mais la session enregistrée ne peut pas être supprimée. Réessayez avant de fermer l’application.</string>
+    <string name="auth_remote_logout_failed">La session a été supprimée de cet appareil, mais le serveur n’a pas confirmé la déconnexion.</string>
+    <string name="auth_checking">Vérification de votre session…</string>
+    <string name="auth_password_hint">Utilisez votre courriel et votre mot de passe AutoTrack.</string>
+    <string name="auth_credentials_required">Saisissez votre courriel et votre mot de passe.</string>
+    <string name="auth_credentials_rejected">Échec de la connexion. Vérifiez vos identifiants et la confirmation du courriel.</string>
+    <string name="auth_login_failed">Connexion sécurisée impossible. Réessayez.</string>
+    <string name="auth_restore_failed">Impossible de restaurer la session. Vérifiez votre connexion ou reconnectez-vous.</string>
+    <string name="auth_storage_failed">Impossible d’ouvrir les données du compte. Réessayez.</string>
+    <string name="auth_configuration_missing">La connexion est indisponible dans cette version.</string>
+</resources>

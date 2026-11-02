@@ -46,19 +46,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         String lowerTitle = fullTitle.toLowerCase();
 
         if (lowerTitle.contains("call")) {
-            holder.tvTitle.setText("Incoming Call");
+            holder.tvTitle.setText(R.string.incoming_call);
             holder.ivIcon.setImageResource(android.R.drawable.ic_menu_call);
             holder.ivIcon.setColorFilter(Color.parseColor("#F44336")); // Red
         } else if (lowerTitle.contains("sms") || lowerTitle.contains("message")) {
-            holder.tvTitle.setText("New Message");
+            holder.tvTitle.setText(R.string.new_message);
             holder.ivIcon.setImageResource(android.R.drawable.sym_action_chat);
             holder.ivIcon.setColorFilter(Color.parseColor("#4CAF50")); // Green
         } else if (lowerTitle.contains("email")) {
-            holder.tvTitle.setText("New Email");
+            holder.tvTitle.setText(R.string.new_email);
             holder.ivIcon.setImageResource(android.R.drawable.ic_dialog_email);
             holder.ivIcon.setColorFilter(Color.parseColor("#2196F3")); // Blue
         } else {
-            holder.tvTitle.setText("Notification");
+            holder.tvTitle.setText(R.string.notification);
             holder.ivIcon.setImageResource(android.R.drawable.ic_dialog_info);
             holder.ivIcon.setColorFilter(Color.GRAY);
         }
@@ -66,7 +66,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         // 3. Extract Lead Name from Title (assuming format "Type from Name")
         if (fullTitle.contains("from ")) {
             String leadName = fullTitle.substring(fullTitle.indexOf("from ") + 5);
-            holder.tvLeadName.setText("From: " + leadName);
+            holder.tvLeadName.setText(holder.itemView.getContext().getString(R.string.from_name, leadName));
         } else {
             holder.tvLeadName.setText(fullTitle);
         }

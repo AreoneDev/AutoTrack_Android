@@ -12,9 +12,9 @@ import java.util.concurrent.*;
 public final class SyncRuntime {
     private static final ScheduledExecutorService worker=Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> scheduled;
-    private static volatile String status="Not synchronized yet";
+    private static volatile int status=com.areonedev.autotrack.R.string.sync_status_idle;
     private SyncRuntime() { }
-    public static String status() { return status; }
+    public static int status() { return status; }
     public static void request(Context context) {
         // Never acquire Services while holding this class lock: DAO writes request sync under Services.
         if(context==null || Services.activeAccount()==null || BuildConfig.SUPABASE_URL.isEmpty()
@@ -37,14 +37,14 @@ public final class SyncRuntime {
                     if(session==null || !session.userId.equals(Services.activeAccount())) return;
                     data=Services.getDataAccess("AutoTrack");
                 }
-                status="Synchronizing";
+                status=com.areonedev.autotrack.R.string.sync_status_running;
                 new SyncEngine(accounts,new SyncEngine.Local() {
                     public List<SyncEngine.Operation> pending(String owner) throws Exception {return data.syncPending(owner);}
                     public void acknowledge(String owner,SyncEngine.Operation op,String result) throws Exception {data.syncAcknowledge(owner,op,result);}
                     public void apply(String owner,String snapshot) throws Exception {data.syncApply(owner,snapshot);}
                 },new SupabaseSyncRemote(new SupabaseSyncRemote.Http(BuildConfig.SUPABASE_URL,BuildConfig.SUPABASE_PUBLISHABLE_KEY))).run();
-                status="Synchronization complete; review any conflicts";
-            } catch(Exception unavailable) { status="Offline or sync unavailable; changes remain on this device"; }
+                status=com.areonedev.autotrack.R.string.sync_status_complete;
+            } catch(Exception unavailable) { status=com.areonedev.autotrack.R.string.sync_status_offline; }
             finally {
                 boolean active=Services.activeAccount()!=null;
                 synchronized(SyncRuntime.class) {

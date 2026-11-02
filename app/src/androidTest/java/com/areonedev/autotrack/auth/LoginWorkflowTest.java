@@ -38,7 +38,8 @@ public class LoginWorkflowTest {
             onView(withId(R.id.auth_sign_in)).perform(click());
             InstrumentationRegistry.getInstrumentation().waitForIdleSync();
             assertEquals(user, Services.activeAccount());
-            onView(withId(R.id.auth_sign_out)).perform(click());
+            onView(withId(R.id.nav_account)).perform(click());
+            onView(withId(R.id.auth_sign_out)).perform(scrollTo(), click());
             InstrumentationRegistry.getInstrumentation().waitForIdleSync();
             assertNull(Services.activeAccount());
             onView(withId(R.id.auth_sign_in)).check(matches(isDisplayed()));

@@ -26,7 +26,7 @@
             android:text="Mission Title"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/tvTimelineDate"
