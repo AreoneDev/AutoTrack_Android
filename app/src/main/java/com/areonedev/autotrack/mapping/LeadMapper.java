@@ -43,8 +43,8 @@ public final class LeadMapper {
         lead.setLeadBudget(number(row, "budget")); lead.setLeadStage(text(row, "stage"));
         lead.setLeadFollowUpDate(day(text(row, "follow_up_date")));
         lead.setLeadScore(number(row, "score")); lead.setLeadNotes(text(row, "notes"));
-        lead.setLeadCreatedAt(parseInstant(text(row, "created_at")));
-        lead.setLastInteractionDate(parseInstant(text(row, "last_interaction_date")));
+        lead.setLeadCreatedAt(parseInstant(text(row, "created_at"), zone));
+        lead.setLastInteractionDate(parseInstant(text(row, "last_interaction_date"), zone));
         lead.setLastInteractionBy(text(row, "last_interaction_by"));
         lead.setLeadStatus(row.get("status") == null || bool(row, "status"));
         return lead;
@@ -98,14 +98,23 @@ public final class LeadMapper {
         // Existing web rows use timestamps. Preserve their calendar day in the selected business zone.
         if (value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) return parse(value, "yyyy-MM-dd", zone);
         if (value.contains("T")) {
-            Date instant = parseInstant(value);
+            Date instant = parseInstant(value, zone);
             return parse(format(instant, "yyyy-MM-dd", zone), "yyyy-MM-dd", zone);
         }
         throw new IllegalArgumentException("Invalid follow-up date.");
     }
     public static String instant(Date value) { return format(value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", TimeZone.getTimeZone("UTC")); }
-    public static Date parseInstant(String value) {
+    public static Date parseInstant(String value) { return parseInstant(value, TimeZone.getDefault()); }
+    private static Date parseInstant(String value, TimeZone localZone) {
         if (value == null || value.isEmpty()) return null;
+        if (value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?")) {
+            String normalized = value;
+            if (value.contains(".")) {
+                int start = value.indexOf('.') + 1;
+                normalized = value.substring(0, start) + (value.substring(start) + "000").substring(0, 3);
+            }
+            return parse(normalized, value.contains(".") ? "yyyy-MM-dd'T'HH:mm:ss.SSS" : "yyyy-MM-dd'T'HH:mm:ss", localZone);
+        }
         if (!value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?(Z|[+-][0-9]{2}:[0-9]{2})"))
             throw new IllegalArgumentException("Invalid timestamp.");
         String normalized = value;

@@ -109,4 +109,12 @@ public class LeadMapperTest {
         Lead lead = mapper.fromRow(Collections.singletonMap("created_at", "2026-11-01T05:30:00.123456+00:00"), 1);
         assertEquals("2026-11-01T05:30:00.123Z", mapper.toRow(lead).get("created_at"));
     }
+    @Test public void acceptsPostgresTimestampsWithoutOffsetInBusinessTimeZone() {
+        Map<String,Object> row = new HashMap<>();
+        row.put("follow_up_date", "2026-11-01T14:00:00");
+        row.put("created_at", "2026-11-02T03:45:08.552");
+        Lead lead = mapper.fromRow(row, 1);
+        assertEquals("2026-11-01", mapper.toRow(lead).get("follow_up_date"));
+        assertEquals("2026-11-02T08:45:08.552Z", mapper.toRow(lead).get("created_at"));
+    }
 }

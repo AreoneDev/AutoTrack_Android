@@ -35,4 +35,19 @@ public class SyncConflictWorkflowTest {
             }
         } finally {Services.closeDataAccess();SyntheticAccount.reset();context.deleteDatabase(AccountSession.databaseName(owner));}
     }
+    @Test public void syncScreenShowsCompletionWithoutAnotherTap() throws Exception {
+        String owner=UUID.randomUUID().toString();
+        android.content.Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+        java.lang.reflect.Field status=SyncRuntime.class.getDeclaredField("status");status.setAccessible(true);
+        Object previous=status.get(null);
+        try {
+            Services.initialize(context);Services.openAccount(owner);SyntheticAccount.install(owner);status.setInt(null,com.areonedev.autotrack.R.string.sync_status_running);
+            try(ActivityScenario<com.areonedev.autotrack.presentation.SyncActivity> scenario=ActivityScenario.launch(com.areonedev.autotrack.presentation.SyncActivity.class)) {
+                onView(withText(com.areonedev.autotrack.R.string.sync_status_running)).check(matches(isDisplayed()));
+                SyncRuntime.setStatus(com.areonedev.autotrack.R.string.sync_status_complete);
+                InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+                onView(withText(com.areonedev.autotrack.R.string.sync_status_complete)).check(matches(isDisplayed()));
+            }
+        } finally {status.set(null,previous);Services.closeDataAccess();SyntheticAccount.reset();context.deleteDatabase(AccountSession.databaseName(owner));}
+    }
 }
