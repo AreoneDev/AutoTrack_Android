@@ -13,13 +13,19 @@ import java.util.List;
 
 public final class SyncActivity extends AccountActivity {
     private LinearLayout content;
+    private TextView statusView;
+    private final Runnable statusListener=() -> {if(statusView!=null) statusView.setText(SyncRuntime.status());};
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);ScrollView scroll=new ScrollView(this);content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(32,32,32,32);scroll.addView(content);setContentView(scroll);
     }
-    @Override protected void onResume() {super.onResume();if(AuthRuntime.hasAccount()) refresh();}
+    @Override protected void onResume() {
+        super.onResume();
+        if(AuthRuntime.hasAccount()) {SyncRuntime.addStatusListener(statusListener);refresh();}
+    }
+    @Override protected void onPause() {SyncRuntime.removeStatusListener(statusListener);super.onPause();}
     private void refresh() {
-        content.removeAllViews();TextView status=new TextView(this);status.setText(SyncRuntime.status());content.addView(status);
+        content.removeAllViews();TextView status=new TextView(this);statusView=status;status.setText(SyncRuntime.status());content.addView(status);
         Button sync=new Button(this);sync.setText(R.string.sync_now);content.addView(sync);
         sync.setOnClickListener(v->{SyncRuntime.request(getApplicationContext());refresh();});
         AuthRuntime.execute(()-> {
